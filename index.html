@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Learning App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <!-------------------- TOP NAVIGATION  -------------------->
+        <div id="topNavigation">
+            <button id="homePageNavigationButton">ホームページ</button>
+            <button id="writeKanjiPageNavigationButton">書く</button>
+            <button id="addNewKanjiPageNavigationButton">新しい言葉</button>
+            <button id="flashcardPageNavigationButton">フラッシュカード</button>
+            <button id="viewAllKanjiNavigationButton">全部の漢字</button>
+        </div>
+
+    </header>
+
+    <!-------------------- HOME PAGE -------------------->
+    <section id="homePage">
+        <h1> </h1>
+        <div id="homePageButtons">
+            <button id="kanjiWritingButton">書く</button>
+            <button id="uploadNewKanjiButton">新しい漢字を追加する</button>
+            <button id="flashcardButton">フラッシュカード</button>
+            <button id="allKanjiButton">全部の漢字</button>
+        </div>
+        <div class="bottomSpace"></div>
+    </section>
+
+    <!-------------------- KANJI WRITING PAGE -------------------->
+    <section id="kanjiWritingPage">
+
+        <div id="kanjiAndHint">
+            <h1 id="randomKanjiDisplay"></h1>
+            <div id="hintText"></div>
+        </div>
+
+        <div id="displayDirections"></div>
+
+        <div id="canvasAndButtons">
+            <div id="kanjiCanvasContainer"> </div>
+            <div id="canvasButtons">
+                <button id="hint">Hint</button>
+                <button id="clearCanvas">Clear</button>
+                <button id="submitKanji">Check</button>
+            </div>
+        </div>
+
+        <div class="bottomSpace"></div>
+
+    </section>
+
+    <!--------------------NEW KANJI PAGE -------------------->
+    <section id="uploadNewKanjiPage">
+
+        <form id="newKanjiForm">
+
+            <label for="newKanji">新しい言葉:</label>
+            <input type="text" id="newKanji" name="newKanji">
+
+            <label for="newKanjiHiragana">ひらがな:</label>
+            <input type="text" id="newKanjiHiragana" name="newKanjiHiragana">
+
+            <label for="newKanjiMeaning">意味:</label>
+            <input type="text" id="newKanjiMeaning" name="newKanjiMeaning">
+
+            <div id="kanjiPartsContainer"></div>
+
+            <button type="button" id="addKanjiPart">漢字の要素を追加する</button>
+
+            <button type="submit" id="submitNewKanji">新しい漢字を追加する</button>
+
+        </form>
+        <div class="bottomSpace"></div>
+
+    </section>
+
+
+
+    <!-------------------- FLASHCARD PAGE -------------------->
+    <section id="flashcardPage">
+        <h3 id = "flashcardCounter">0/0</h3>
+        <div id="flashcardContainer">
+            <div id="flashcardQuestion"></div>
+            <div id="flashcardChoices"></div>
+        </div>
+        <div class="bottomSpace"></div>
+    </section>
+
+    <!-------------------- DISPLAY ALL KANJI PAGE -------------------->
+    <section id="displayAllKanjiPage">
+        <h1>全部の漢字</h1>
+        <h1 id="totalKanji">Total Kanji: #</h1>
+        <div id="databaseButton">
+            <button id="exportDatabaseButton">Export Database</button>
+            <button id="importDatabaseButton">Import Database</button>
+            <input type=file id="importKanjiFile" accept=".json" hidden>
+        </div>
+        <div id="allKanjiContainer"></div>
+        <div class="bottomSpace"></div>
+    </section>
+
+
+    <!-------------------- POPUPS -------------------->
+    <section class="popup">
+        <div id="popupTitle"></div>
+        <button class="formButton" id="popupButton"></button>
+    </section>
+
+    <!-- Link your JavaScript files here -->
+    <script src="script.js"></script>
+</body>
+
+</html>

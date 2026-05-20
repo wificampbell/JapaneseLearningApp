@@ -14,6 +14,10 @@ Purple = #DCCCEC
 /*@import url('https://fonts.googleapis.com/css2?family=Kaisei+Decol&display=swap');
 */
 
+:root {
+    --pageColor: #FFCBE1; 
+}
+
 html,
 body {
     width: 100%;
@@ -36,7 +40,7 @@ link {
 
 button {
     border: none;
-    box-shadow: 5px 5px 0px lightgray;
+    box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.273);
     color: black;
 }
 
@@ -49,7 +53,7 @@ button {
     flex-direction: row;
     gap: 20px;
     justify-content: center;
-    background-color: #D6E5BD;
+    background-color: var(--pageColor);
     padding-bottom: 20px;
 }
 
@@ -85,7 +89,8 @@ button {
 #homePage h1{
     text-align: center;
     margin-top: 70px;
-    margin-bottom: 70px;
+    height: 100%;
+    margin-bottom: 10px;
     font-family: "Kaisei Decol", "Times New Roman";
 }
 
@@ -126,6 +131,12 @@ button {
     flex-direction: column;
     height: 100%;
     position: relative;
+    background-image: url("Images/writingPage.PNG");
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-position: 5px -90px;
+    background-size: 100% 100%;
+    background-color: #D6E5BD;
     
 }
 
@@ -159,7 +170,7 @@ button {
     font-size: 20px;
     margin-top: 10px;
     line-height: 1;
-    margin-left: 20px;
+    margin-left: 80px;
 }
 
 #canvasAndButtons {
@@ -189,15 +200,16 @@ button {
 
 #kanjiCanvasContainer {
     display: flex;
-    flex-direction: row;
     gap: 20px;
     justify-content: center;
+    justify-items: center;
     flex-wrap: nowrap;
     border-radius: 30px;
     padding: 20px;
     flex: 1;
     width: 90%;
     max-width: 950px;
+    overflow-x: auto;
 }
 
 .kanjiBox {
@@ -285,7 +297,7 @@ button {
 }
 
 
-.addStrokeButton, #newKanjiForm select, .strokeList select, .strokeEditDeleteButton, .addStrokeButton, .saveEditButton{
+.addStrokeButton, .deleteStrokeButton, #newKanjiForm select, .strokeList select, .strokeEditDeleteButton, .saveEditButton{
     background-color: #F9E1AB;
     border-radius: 10px;
     margin-left: 10px;
@@ -299,8 +311,13 @@ button {
     margin-bottom: 10px;
 }
 
-.addStrokeButton{
+.addStrokeButton, .deleteStrokeButton{
     margin-bottom: 20px;
+}
+
+.editContainer {
+    max-height: 300px;
+    overflow-y: scroll;
 }
 
 .editContainerInputs{
@@ -316,7 +333,8 @@ button {
 }
 
 .kanjiPartBox{
-    margin-bottom: 10px;
+    margin-bottom: 20px;
+    margin-top: 20px;
 }
 
 #addKanjiPart, #submitNewKanji {
@@ -372,7 +390,7 @@ button {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-
+    margin-top: 30px;
     gap: 20px;
     padding: 10px;
     
@@ -394,10 +412,11 @@ button {
     overflow-y: scroll;
     background-image: url("Images/allKanjiPage.PNG");
     background-repeat: no-repeat;
-    background-attachment: scroll;
-    background-position: center -23px;
+    background-attachment: fixed;
+    background-position: center 40px;
     background-size: 100% 100%;
     overflow-x: hidden;
+    position: relative;
 }
 
 #displayAllKanjiPage h1{
@@ -412,7 +431,7 @@ button {
     grid-template-rows: repeat(2, 1fr);
     gap: 30px;
     margin: auto;
-    margin-top: -150px;
+    margin-top: -80px;
 }
 
 .kanjiCard{
@@ -434,17 +453,18 @@ button {
 }
 
 #databaseButton{
+    position: fixed;
+    top: 215px;
+    left: 920px;
     display: flex;
     flex-direction: column;
-    position: relative;
     gap: 20px;
-    left: 910px;
-    top: -90px;
-    width: 100%;
+    z-index: 1000;
+    width: 90%;
 }
 
 #databaseButton button {
-    background-color: #F9E1AB;
+    background-color: #BCD8EC;
     border-radius: 20px;
     font-size: 20px;
     width: 15%

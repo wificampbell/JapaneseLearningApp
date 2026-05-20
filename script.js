@@ -404,8 +404,9 @@ function checkKanji() {
         }
 
         if (user.length !== expected.length) {
-            showPopup("Incorrect amount of strokes.", "オケ", null);
-            continue;
+            showPopup("Incorrect amount of strokes.", "オケ", "displayRandomKanji");
+            resetStrokeData();
+            return;
         }
 
         //counting correct # of stroke directions
@@ -498,29 +499,31 @@ addKanjiPartButton.addEventListener("click", () => {
     // ADD STROKE FOR NEW KANJI
     addStrokeButton.addEventListener("click", () => {
 
-        //If the kanji already exists, no need to have user input it again
-        const existing = getStrokeDirectionsForKanji(kanjiInput.value);
+        if (kanjiInput.value) {
+            //If the kanji already exists, no need to have user input it again
+            const existing = getStrokeDirectionsForKanji(kanjiInput.value);
 
-        if (existing) {
-            strokeContainer.innerHTML = "";
+            if (existing && existing != []) {
+                strokeContainer.innerHTML = "";
 
-            const div = document.createElement("div");
-            div.textContent = "The Strokes for This Kanji Are Already in The System!";
-            strokeContainer.appendChild(div);
-            return;
+                const div = document.createElement("div");
+                div.textContent = "The Strokes for This Kanji Are Already in The System!";
+                strokeContainer.appendChild(div);
+                return;
+            }
+
+            const select = document.createElement("select");
+
+            directions.forEach(dir => {
+                const option = document.createElement("option");
+                option.value = dir;
+                option.textContent = dir;
+                select.appendChild(option);
+            });
+
+            strokeContainer.appendChild(select);
+            strokeSelects.push(select);
         }
-
-        const select = document.createElement("select");
-
-        directions.forEach(dir => {
-            const option = document.createElement("option");
-            option.value = dir;
-            option.textContent = dir;
-            select.appendChild(option);
-        });
-
-        strokeContainer.appendChild(select);
-        strokeSelects.push(select);
     });
 
     deleteStrokeButton.addEventListener("click", () => {
@@ -761,7 +764,7 @@ function renderFlashcard(question, correctAnswer, choices) {
         choiceButton.addEventListener("click", () => {
             if (choice == correctAnswer) {
                 makeFlashcards();
-                flashcardCorrectAnswers++; 
+                flashcardCorrectAnswers++;
             }
             else {
                 showPopup("Incorrect. The current answer is: " + correctAnswer, "次", "makeFlashcards");
@@ -1108,6 +1111,7 @@ function showPage(pageToShow) {
         hintText.classList.add("hidden");
         displayRandomKanji();
         resetStrokeData();
+        document.documentElement.style.setProperty('--pageColor', '#D6E5BD');
     }
 
     // ------ HOME PAGE
@@ -1121,16 +1125,20 @@ function showPage(pageToShow) {
     // ------ UPLOAD NEW KANJI PAGE
     if (pageToShow == uploadNewKanjiPage) {
         kanjiPartsContainer.innerHTML = "";
+        document.documentElement.style.setProperty('--pageColor', '#F9E1AB');
+
     }
 
     // ------ FLASHCARD PAGE
     if (pageToShow == flashcardPage) {
         makeFlashcards();
+        document.documentElement.style.setProperty('--pageColor', '#DCCCEC');
     }
 
     // ------ ALL KANJI PAGE
     if (pageToShow == displayAllKanjiPage) {
         renderAllKanjiCards();
+        document.documentElement.style.setProperty('--pageColor', '#BCD8EC');
     }
 }
 
@@ -1198,7 +1206,7 @@ function showPopup(text, buttonText, buttonFunction, payload = null) {
 }
 
 // UPDATES FLASHCARD AND WRITING COUNTERS
-function updateCounter(counterElement, totalQuestions, totalCorrect){
+function updateCounter(counterElement, totalQuestions, totalCorrect) {
     counterElement.textContent = totalCorrect + "/" + totalQuestions;
 }
 

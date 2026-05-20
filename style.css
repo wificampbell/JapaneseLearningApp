@@ -188,6 +188,7 @@ button {
     flex-direction: column;
     gap: 10px;
     align-items: flex-end;
+    margin-top: 80px;
     
 }
 
@@ -353,7 +354,7 @@ button {
     background-image: url("Images/flashcardPage.PNG");
     background-repeat: no-repeat;
     background-attachment: scroll;
-    background-position: center -80px;
+    background-position: center -100px;
     background-size: 100% 100%;
 }
 
@@ -454,7 +455,7 @@ button {
 
 #databaseButton{
     position: fixed;
-    top: 215px;
+    top: 250px;
     left: 920px;
     display: flex;
     flex-direction: column;

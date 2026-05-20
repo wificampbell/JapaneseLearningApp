@@ -274,6 +274,7 @@ button {
     width: 60%;
     padding: 20px;
     margin: auto;
+    margin-top: 100px;
     border-radius: 30px;
     border-width: 20px;
     border-color: #F9E1AB;
@@ -412,7 +413,6 @@ button {
 #displayAllKanjiPage{
     display: flex;
     flex-direction: column;
-    overflow-y: scroll;
     background-image: url("Images/allKanjiPage.PNG");
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -491,7 +491,7 @@ button {
     top: 50%;
     left: 50%;
     transform: translate(-50%, 100%);
-    background: #F9E1AB;
+    background: var(--pageColor);
     border-radius: 20px;
     padding: 30px;
     width: 70%;

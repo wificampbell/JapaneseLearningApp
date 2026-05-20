@@ -188,7 +188,7 @@ button {
     flex-direction: column;
     gap: 10px;
     align-items: flex-end;
-    margin-top: 10px;
+    margin-top: 40px;
     
 }
 
@@ -455,8 +455,8 @@ button {
 
 #databaseButton{
     position: fixed;
-    top: 250px;
-    left: 930px;
+    top: 260px;
+    left: 920px;
     display: flex;
     flex-direction: column;
     gap: 20px;

@@ -149,7 +149,7 @@ button {
     line-height: 1;
     font-family: "Kaisei Decol";
     margin-top: 20px;
-    margin-left: 100px;
+    margin-left: 95px;
 
 }
 
@@ -437,7 +437,7 @@ button {
     flex-direction: column;
     position: relative;
     gap: 20px;
-    left: 950px;
+    left: 930px;
     top: -90px;
     width: 100%;
 }

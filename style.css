@@ -263,8 +263,8 @@ button {
     background-image: url("Images/newKanjiPage.PNG");
     background-repeat: no-repeat;
     background-attachment: scroll;
-    background-position: center -40px;
-    background-size: 100% 100%;
+    background-position: center -70px;
+    background-size: contain;
 }
 
 #newKanjiForm{
@@ -457,8 +457,8 @@ button {
 
 #databaseButton{
     position: fixed;
-    top: 260px;
-    left: 920px;
+    top: 250px;
+    left: 925px;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -469,8 +469,9 @@ button {
 #databaseButton button {
     background-color: #BCD8EC;
     border-radius: 20px;
-    font-size: 20px;
-    width: 15%
+    font-size: 22px;
+    width: 15%;
+    font-family: "Kaisei Decol", "Times New Roman";
 }
 
 

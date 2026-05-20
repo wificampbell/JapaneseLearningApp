@@ -72,7 +72,7 @@ button {
     display: flex;
     flex-direction: column;
 
-    min-height: 100dvh;
+    height: 100%;
 
     gap: 10px;
     background-color: #FFCBE1;
@@ -83,7 +83,7 @@ button {
     background-repeat: no-repeat;
     background-attachment: scroll;
     background-position: top;
-    background-size: contain;
+    background-size: cover;
 }
 
 #homePage h1{
@@ -91,6 +91,8 @@ button {
     margin-top: 70px;
     height: 100%;
     margin-bottom: 10px;
+    font-size: 90px;
+    margin-top: 80px;
     font-family: "Kaisei Decol", "Times New Roman";
 }
 

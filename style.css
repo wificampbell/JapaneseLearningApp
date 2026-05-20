@@ -30,6 +30,11 @@ h1{
     font-size: 64px;;
 }
 
+a {
+    color: black;
+    text-decoration: none;
+}
+
 button {
     border: none;
     box-shadow: 5px 5px 0px lightgray;
@@ -144,6 +149,8 @@ button {
     line-height: 1;
     font-family: "Kaisei Decol";
     margin-top: 20px;
+    margin-left: 120px;
+
 }
 
 
@@ -430,7 +437,7 @@ button {
     flex-direction: column;
     position: relative;
     gap: 20px;
-    left: 850px;
+    left: 970px;
     top: -90px;
     width: 100%;
 }

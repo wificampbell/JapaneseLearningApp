@@ -159,11 +159,11 @@ button {
     text-align: center;
     font-size: 400%;
     margin-bottom: 0px;
+    max-height: 64px;
     line-height: 1;
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
     margin-top: 20px;
     margin-left: 75px;
-
 }
 
 
@@ -191,6 +191,8 @@ button {
     gap: 10px;
     align-items: flex-end;
     margin-top: 40px;
+    position: fixed;
+    right: 40px;
     
 }
 

@@ -451,11 +451,11 @@ button {
 #displayAllKanjiPage{
     display: flex;
     flex-direction: column;
-    /*background-image: url("Images/allKanjiPage.PNG");
+    background-image: url("Images/allKanjiPage.PNG");
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: center 40px;
-    background-size: 100% 100%;*/
+    background-size: 100% 100%;
     overflow-x: hidden;
     overflow-y: hidden;
 }
@@ -472,7 +472,7 @@ button {
     grid-template-rows: repeat(2, 1fr);
     gap: 30px;
     margin: auto;
-    margin-top: -80px;
+    margin-top: -200px;
     width: 75%;
     margin-left: 30px;
 }
@@ -496,8 +496,8 @@ button {
 }
 
 #databaseButton{
-    position: fixed;
-    top: 250px;
+    position: relative;
+    top: -49px;
     left: 925px;
     display: flex;
     flex-direction: column;

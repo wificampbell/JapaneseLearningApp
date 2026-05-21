@@ -454,10 +454,10 @@ button {
     background-image: url("Images/allKanjiPage.PNG");
     background-repeat: no-repeat;
     background-attachment: fixed;
-    background-position: center 40px;
+    background-position: center 90px;
     background-size: 100% 100%;
     overflow-x: hidden;
-    overflow-y: hidden;
+    overflow-y: scroll;
 }
 
 #displayAllKanjiPage h1{

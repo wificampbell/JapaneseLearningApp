@@ -506,31 +506,35 @@ addKanjiPartButton.addEventListener("click", () => {
     // ADD STROKE FOR NEW KANJI
     addStrokeButton.addEventListener("click", () => {
 
-        if (kanjiInput.value) {
-            //If the kanji already exists, no need to have user input it again
-            const existing = getStrokeDirectionsForKanji(kanjiInput.value);
-
-            if (existing && existing != []) {
-                strokeContainer.innerHTML = "";
-
-                const div = document.createElement("div");
-                div.textContent = "The Strokes for This Kanji Are Already in The System!";
-                strokeContainer.appendChild(div);
-                return;
-            }
-
-            const select = document.createElement("select");
-
-            directions.forEach(dir => {
-                const option = document.createElement("option");
-                option.value = dir;
-                option.textContent = dir;
-                select.appendChild(option);
-            });
-
-            strokeContainer.appendChild(select);
-            strokeSelects.push(select);
+        if (!kanjiInput.value) {
+            return;
         }
+
+        //determine if this kanji already exists in the database 
+        const existing = getStrokeDirectionsForKanji(kanjiInput.value);
+
+        // clear container
+        strokeContainer.innerHTML = "";
+
+        if (existing) {
+
+            const strokesExistText = document.createElement("div");
+            strokesExistText.textContent = "The strokes for this kanji are already in the system!";
+            strokeContainer.appendChild(strokesExistText);
+            return;
+        }
+
+        const select = document.createElement("select");
+
+        directions.forEach(dir => {
+            const option = document.createElement("option");
+            option.value = dir;
+            option.textContent = dir;
+            select.appendChild(option);
+        });
+
+        strokeContainer.appendChild(select);
+        strokeSelects.push(select);
     });
 
     deleteStrokeButton.addEventListener("click", () => {
@@ -568,60 +572,91 @@ newKanjiForm.addEventListener("submit", (e) => {
 
 // ADDING A NEW KANJI AND ITS DETAILS
 function addNewKanji() {
-    newKanji = document.getElementById("newKanji").value.trim();
-    newKanjiHiragana = document.getElementById("newKanjiHiragana").value.trim();
-    newKanjiMeaning = document.getElementById("newKanjiMeaning").value.trim();
 
-    //empty fields checks
-    if (newKanji === "" || newKanjiHiragana === "" || newKanjiMeaning === "") {
-        showPopup("Please Enter All Information", "続く", null)
+    const newKanji = document.getElementById("newKanji").value.trim();
+    const newKanjiHiragana = document.getElementById("newKanjiHiragana").value.trim();
+    const newKanjiMeaning = document.getElementById("newKanjiMeaning").value.trim();
+
+    // -------------------- VALIDATION -------------------- //
+
+    // empty field check
+    if (
+        newKanji === "" ||
+        newKanjiHiragana === "" ||
+        newKanjiMeaning === ""
+    ) {
+        showPopup("Please Enter All Information", "続く", null);
         return;
     }
 
-    //Cleaning up kanji parts
-    let kanjiParts = kanjiPartInputs.filter(part => {
-        //remove blank kanji names
-        if (part.kanjiInput.value.trim() === "") {
-            return false;
+    //duplicate kanji check
+    if (findExistingKanji(newKanji)) {
+        showPopup("This kanji already exists in the database", "OK", null);
+        return;
+    }
+
+    //must have at least one part
+    if (kanjiPartInputs.length === 0) {
+        showPopup("Please add at least one kanji part", "OK", null);
+        return;
+    }
+
+    //validate each part before building data
+    for (const part of kanjiPartInputs) {
+
+        const kanjiChar = part.kanjiInput.value.trim();
+
+        if (kanjiChar === "") {
+            showPopup("Kanji part cannot be empty", "OK", null);
+            return;
         }
-        //remove parts with no strokes
-        if (part.strokeSelects.length === 0) {
-            return false;
-        }
-        return true;
-    })
 
-    //transforms every kanji part input into an object to add to database
-    kanjiParts = kanjiParts.map(part => {
-        const existing = findExistingKanji(part.kanjiInput.value);
+        const isExistingKanji = findExistingKanji(kanjiChar);
 
-        //reuse existing stroke data if exists
-        if (existing) {
-            const existingPart = existing.parts.find(p =>
-                p.kanji === part.kanjiInput.value
+        const hasStrokes =
+            part.strokeSelects.length > 0 &&
+            part.strokeSelects.every(sel => sel.value !== "");
 
+        //if it's a new kanji AND has no strokes, error
+        if (!isExistingKanji && !hasStrokes) {
+            showPopup(
+                `Please add stroke directions for: ${kanjiChar}`,
+                "OK",
+                null
             );
+            return;
+        }
+    }
+
+    //build the word's kanji parts
+
+    const kanjiParts = kanjiPartInputs.map(part => {
+
+        const kanjiChar = part.kanjiInput.value.trim();
+
+        const existing = findExistingKanji(kanjiChar);
+
+        // reuse strokes if kanji already exists
+        if (existing) {
             return {
-                kanji: part.kanjiInput.value,
-                strokeDirections: existingPart.strokeDirections
+                kanji: kanjiChar,
+                strokeDirections: existing.parts[0]?.strokeDirections || []
             };
         }
 
-        //array of all the strokes of the kanji
-        const strokeDirections = part.strokeSelects.map(sel => sel.value);
-
+        // otherwise use user input
         return {
-            kanji: part.kanjiInput.value,
-            strokeDirections
+            kanji: kanjiChar,
+            strokeDirections: part.strokeSelects.map(sel => sel.value)
         };
     });
 
-    //creates the final kanji word objet 
+    //create entry
     const entry = {
         kanji: newKanji,
         hiragana: newKanjiHiragana,
         meaning: newKanjiMeaning,
-        parts: kanjiParts,
+        parts: kanjiParts
     };
 
     kanjiDatabase.push(entry);
@@ -632,15 +667,16 @@ function addNewKanji() {
     );
 
     console.log("Saved word:", entry);
-    showPopup("New Kanji Saved: " + entry.kanji, "次", null)
 
-    // reset UI
+    showPopup("New Kanji Saved: " + entry.kanji, "次", null);
+
+    //reset ui
     kanjiPartsContainer.innerHTML = "";
     kanjiPartInputs = [];
     document.getElementById("newKanji").value = "";
     document.getElementById("newKanjiHiragana").value = "";
     document.getElementById("newKanjiMeaning").value = "";
-};
+}
 
 
 
@@ -826,7 +862,8 @@ function renderAllKanjiCards() {
         return
     }
 
-    kanjiDatabase.forEach(eachKanji => {
+    //makes a copy and reverses the order
+    [...kanjiDatabase].reverse().forEach(eachKanji => {
 
         const kanjiCard = document.createElement("div");
         kanjiCard.classList.add("kanjiCard");

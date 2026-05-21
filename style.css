@@ -471,6 +471,8 @@ button {
     gap: 30px;
     margin: auto;
     margin-top: -80px;
+    width: 75%;
+    margin-left: 30px;
 }
 
 .kanjiCard{

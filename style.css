@@ -280,11 +280,16 @@ button {
     border-color: #F9E1AB;
     border-style: solid;
     justify-content: center;
-    gap: 17px
+    gap: 17px;
 }
 
-#newKanjiForm label{
+#newKanjiForm label, .formKanjiInputText{
     font-size: 24px;
+}
+
+.formKanjiInputText{
+    margin-bottom: 20px;
+    margin-top: -20px;
 }
 
 #newKanjiForm input{
@@ -293,6 +298,7 @@ button {
     padding: 0px 15px 0px 15px;
     font-size: 25px;
     margin-top: -20px;
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
 #strokeContainer{
@@ -301,12 +307,33 @@ button {
 }
 
 
-.newFormButtons, #newKanjiForm select, .strokeList select, .strokeEditDeleteButton, .saveEditButton{
+.newFormButtons, #newKanjiForm select, .strokeList select, .strokeEditDeleteButton, .saveEditButton, .addStrokeButton{
     background-color: #F9E1AB;
     border-radius: 10px;
     margin-left: 10px;
     font-size: 20px;
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
+}
+
+.strokeList{
+    margin-bottom: 10px;
+}
+
+.strokeEditDeleteButton, .saveEditButton, .addStrokeButton {
+    background-color: #FFCBE1;
+}
+
+.strokeList select{
+    background-color: #FFCBE1;
+    border-radius: 30px;
+    border-width: 0px;
+    margin-left: 10px;
+    font-size: 20px;
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
+}
+
+.saveEditButton{
+    margin-top: 20px;
 }
 
 .strokeList{
@@ -316,9 +343,13 @@ button {
     margin-bottom: 10px;
 }
 
+.kanjiInput{
+    width: 230px;
+}
+
 .newFormButtons {
     margin-bottom: 20px;
-    font-size: 18px;
+    font-size: 20px;
 }
 
 .editContainer {
@@ -330,12 +361,15 @@ button {
     display: flex;
     flex-direction: row;
     gap: 30px;
+    margin-top: 40px;
 }
 
 .editContainerInputs input{
     height: 20px;
     width: 90%;
     font-size: 24px;
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
+
 }
 
 .kanjiPartBox{

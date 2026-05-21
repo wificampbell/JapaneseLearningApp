@@ -463,12 +463,16 @@ function displayRandomKanji() {
 // Handles adding a new kanji and strokes
 addKanjiPartButton.addEventListener("click", () => {
 
+    const text = document.createElement("div");
+    text.textContent = "漢字の要素:";
+    text.classList.add("formKanjiInputText");
+
     const box = document.createElement("div");
     box.classList.add("kanjiPartBox");
 
     // kanji input
     const kanjiInput = document.createElement("input");
-    kanjiInput.placeholder = "Kanji (e.g. 勉)";
+    kanjiInput.classList.add("kanjiInput");
 
     // stroke container
     const strokeContainer = document.createElement("div");
@@ -540,6 +544,7 @@ addKanjiPartButton.addEventListener("click", () => {
         box.remove();
     });
 
+    box.appendChild(text);
     box.appendChild(kanjiInput);
     box.appendChild(addStrokeButton);
     box.appendChild(deleteStrokeButton);
@@ -632,9 +637,9 @@ function addNewKanji() {
     // reset UI
     kanjiPartsContainer.innerHTML = "";
     kanjiPartInputs = [];
-    newKanji.textContent = "";
-    newKanjiHiragana.textContent = "";
-    newKanjiMeaning.textContent = "";
+    document.getElementById("newKanji").value = "";
+    document.getElementById("newKanjiHiragana").value = "";
+    document.getElementById("newKanjiMeaning").value = "";
 };
 
 
@@ -943,6 +948,14 @@ function importKanjiDatabase(event) {
 // EDIT A KANJI CARD 
 function openEditForm(kanjiName) {
 
+    const closeButton = document.createElement("button");
+    closeButton.textContent = "X";
+    closeButton.classList.add("closePopupButton");
+
+    closeButton.addEventListener("click", () => {
+        closePopup();
+    });
+
     popup.innerHTML = "";
 
     const entry = findKanjiByName(kanjiName);
@@ -958,16 +971,17 @@ function openEditForm(kanjiName) {
     const kanjiInput = document.createElement("input");
     kanjiInput.value = entry.kanji;
 
-    const hiraInput = document.createElement("input");
-    hiraInput.value = entry.hiragana;
+    const hiraganaInput = document.createElement("input");
+    hiraganaInput.value = entry.hiragana;
 
     const meaningInput = document.createElement("input");
     meaningInput.value = entry.meaning;
 
     editContainerInputs.appendChild(kanjiInput);
-    editContainerInputs.appendChild(hiraInput);
+    editContainerInputs.appendChild(hiraganaInput);
     editContainerInputs.appendChild(meaningInput);
 
+    container.appendChild(closeButton);
     container.appendChild(editContainerInputs);
 
     // ---------- STROKE EDITOR ----------
@@ -1037,6 +1051,14 @@ function openEditForm(kanjiName) {
 
             const select = document.createElement("select");
 
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "X";
+            deleteButton.classList.add("strokeEditDeleteButton");
+
+            deleteButton.addEventListener("click", () => {
+                row.remove();
+            });
+
             ["top-bottom", "bottom-top", "left-right", "right-left", "diagonal-down", "diagonal-up"]
                 .forEach(d => {
                     const option = document.createElement("option");
@@ -1046,6 +1068,7 @@ function openEditForm(kanjiName) {
                 });
 
             row.appendChild(select);
+            row.appendChild(deleteButton);
             strokeList.appendChild(row);
         });
 
@@ -1065,7 +1088,7 @@ function openEditForm(kanjiName) {
     saveButton.addEventListener("click", () => {
 
         entry.kanji = kanjiInput.value;
-        entry.hiragana = hiraInput.value;
+        entry.hiragana = hiraganaInput.value;
         entry.meaning = meaningInput.value;
 
         // rebuild stroke structure from DOM
@@ -1093,6 +1116,7 @@ function openEditForm(kanjiName) {
         localStorage.setItem("kanjiDatabase", JSON.stringify(kanjiDatabase));
 
         closePopup();
+        renderAllKanjiCards();
     });
 
     container.appendChild(saveButton);

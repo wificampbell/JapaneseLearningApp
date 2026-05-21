@@ -391,6 +391,7 @@ function checkKanji() {
 
     let correct = 0;
     let total = 0;
+    let updatedCorrectness;
 
     for (let i = 0; i < target.parts.length; i++) {
         const expected = target.parts[i].strokeDirections;
@@ -403,6 +404,8 @@ function checkKanji() {
 
         if (user.length !== expected.length) {
             showPopup("Answer: " + target.kanji + "\nStrokes Given: " + user.length + "\nExpected Amount: " + expected.length, "オケ", "displayRandomKanji");
+            updatedCorrectness = target.correctness - 5;
+            saveKanjiEdits(target.kanji, {correctness: updatedCorrectness});
             resetStrokeData();
             return;
         }
@@ -416,16 +419,35 @@ function checkKanji() {
         }
     }
 
-    let score = 0
-
+    let score = 0;
     if (total === 0) {
-        score == 0;
+        score = 0;
     }
     else {
         score = Math.round((correct / total) * 100);
     }
 
-    showPopup("スコア: " + score + "%", "次", "displayRandomKanji");
+    if (score <= 70) {
+        showPopup("Answer: " + target.kanji + "\nスコア: " + score + "%", "次", "displayRandomKanji");
+        if (!("correctness" in target)) {
+            updatedCorrectness = score;
+        }
+        else {
+            updatedCorrectness = (target.correctness + score) / 2;
+        }
+    }
+    else {
+        showPopup("スコア: " + score + "%", "次", "displayRandomKanji");
+        if (!("correctness" in target)) {
+            updatedCorrectness = 100;
+        }
+        else {
+            updatedCorrectness = (target.correctness + score) / 2;
+        }
+    }
+
+    console.log(target, target.correctness, kanjiDatabase);
+    saveKanjiEdits(target.kanji, {correctness: updatedCorrectness});
     resetStrokeData();
 }
 
@@ -620,7 +642,7 @@ function addNewKanji() {
 
         //if it's a new kanji AND has no strokes, error
         if (!isExistingKanji && !hasStrokes) {
-            showPopup("Please add stroke directions for: " + kanjiChar, "オケ", nul );
+            showPopup("Please add stroke directions for: " + kanjiChar, "オケ", nul);
             return;
         }
     }
@@ -898,6 +920,22 @@ function renderKanjiCard(eachKanji) {
     })
 
     totalKanji.textContent = "Total Kanji: " + kanjiDatabase.length;
+
+    let kanjiCardColor = "#ff6a56"; 
+
+    if (!("correctness" in eachKanji)) {
+        kanjiCardColor = "#a4a4a4"; 
+    }
+    if ((eachKanji.correctness ?? 0) >= 70) {
+        kanjiCardColor = "#80e5a5";
+    }
+    else if ((eachKanji.correctness ?? 0) >= 45) {
+        kanjiCardColor = "#ffe66b";
+    }
+    else if ((eachKanji.correctness ?? 0) >= 30) {
+        kanjiCardColor = "#ffc868";
+    }
+    kanjiCard.style.backgroundColor = kanjiCardColor;
 }
 
 

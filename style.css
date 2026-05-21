@@ -308,10 +308,6 @@ button {
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
-.strokeList{
-    margin-bottom: 10px;
-}
-
 .strokeEditDeleteButton, .saveEditButton, .addStrokeButton {
     background-color: #FFCBE1;
 }
@@ -329,11 +325,17 @@ button {
     margin-top: 20px;
 }
 
-.strokeList{
+.strokeList {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(160px, 1fr));
+    gap: 58px;
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.strokeList > div {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 10px;
+    align-items: center;
 }
 
 .kanjiInput{
@@ -521,7 +523,7 @@ button {
 
 .kanjiCard{
     border-radius: 10px;
-    background-color: #BCD8EC;
+    background-color: lightgray;
     padding: 10px;
     justify-content: center;
 }

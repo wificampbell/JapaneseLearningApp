@@ -146,8 +146,10 @@ button {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0px;
-    margin: 30px auto 30px 30px;
+
+    height: 140px;
+
+    margin: 30px auto 0px 30px;
     padding: 0px 0px 40px 0px;
     justify-content: center;
     width: 95%;
@@ -155,24 +157,30 @@ button {
 
 }
 
-#kanjiWritingPage h1{
+#randomKanjiDisplay{
     text-align: center;
     font-size: 50px;
     margin-bottom: 30px;
     max-height: 35px;
-    line-height: 1;
+    line-height: 1.1;
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
     margin-top: 20px;
     margin-left: 75px;
+    max-height: 90px;
 }
 
 
-#hintText{
+#hintText {
+    position: absolute;
+
+    top: 170px; 
+    left: -40px;
+
+    width: 100%;
     text-align: center;
+
     font-size: 20px;
-    margin-top: 10px;
     line-height: 1;
-    margin-left: 80px;
 }
 
 #canvasAndButtons {
@@ -520,8 +528,22 @@ button {
     font-size: 26px; 
     width: 20%;
     align-self: center;
-    transform: translateY(-80px);
-    
+    transform: translateY(-80px);    
+}
+
+#searchForKanji{
+    border-radius: 10px;
+    padding: 10px;
+    border-width: 4px;
+    margin-top: -50px;
+    width: 850px;
+    margin-bottom: 90px;
+    margin-left: 30px;
+    border-color: #BCD8EC;
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
+    font-size: 15px;
+    outline: none;
+    box-shadow: none;
 }
 
 

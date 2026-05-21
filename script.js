@@ -78,7 +78,7 @@ const displayAllKanjiPage = document.getElementById("displayAllKanjiPage");
 const exportDatabaseButton = document.getElementById("exportDatabaseButton");
 const importDatabaseButton = document.getElementById("importDatabaseButton");
 const totalKanji = document.getElementById("totalKanji");
-
+const searchForKanji = document.getElementById("searchForKanji");
 
 // ーーーーーーーーーーーーーー POPUP
 
@@ -851,50 +851,55 @@ function renderFlashcard(question, correctAnswer, choices) {
 
 // -------------------- ALL KANJI -------------------- // 
 
+// OVERALL RENDER FOR KANJI CARDS
 function renderAllKanjiCards() {
+    const container = document.getElementById("allKanjiContainer");
+    container.innerHTML = "";
+
+    [...kanjiDatabase].reverse().forEach(renderKanjiCard);
+
+    totalKanji.textContent = "Total Kanji: " + kanjiDatabase.length;
+}
+
+// INDIVIDUAL RENDERING - USED FOR FILTERING
+function renderKanjiCard(eachKanji) {
     const allKanjiContainer = document.getElementById("allKanjiContainer");
-    allKanjiContainer.innerHTML = "";
 
-    if (kanjiDatabase.length < 1) {
-        return
-    }
+    const kanjiCard = document.createElement("div");
+    kanjiCard.classList.add("kanjiCard");
 
-    //makes a copy and reverses the order
-    [...kanjiDatabase].reverse().forEach(eachKanji => {
+    const kanjiTitle = document.createElement("h2");
+    kanjiTitle.textContent = eachKanji.kanji;
+    kanjiTitle.classList.add("kanjiTitle");
 
-        const kanjiCard = document.createElement("div");
-        kanjiCard.classList.add("kanjiCard");
+    const kanjiHiragana = document.createElement("h3");
+    kanjiHiragana.textContent = eachKanji.hiragana;
+    kanjiHiragana.classList.add("kanjiHiragana");
 
-        const kanjiTitle = document.createElement("h2");
-        kanjiTitle.innerHTML = eachKanji.kanji;
-        kanjiTitle.classList.add("kanjiTitle");
+    const kanjiMeaning = document.createElement("h3");
+    kanjiMeaning.textContent = eachKanji.meaning;
+    kanjiMeaning.classList.add("kanjiMeaning");
 
-        const kanjiHiragana = document.createElement("h3");
-        kanjiHiragana.innerHTML = eachKanji.hiragana;
-        kanjiHiragana.classList.add("kanjiHiragana");
+    const kanjiStrokeAmount = document.createElement("h3");
+    kanjiStrokeAmount.textContent =
+        "Strokes: " + getTotalStrokeCount(eachKanji);
+    kanjiStrokeAmount.classList.add("kanjiStrokeAmount");
 
-        const kanjiMeaning = document.createElement("h3");
-        kanjiMeaning.innerHTML = eachKanji.meaning;
-        kanjiMeaning.classList.add("kanjiMeaning");
+    kanjiCard.append(
+        kanjiTitle,
+        kanjiHiragana,
+        kanjiMeaning,
+        kanjiStrokeAmount
+    );
 
-        const kanjiStrokeAmount = document.createElement("h3");
-        kanjiStrokeAmount.innerHTML = "Strokes: " + getTotalStrokeCount(eachKanji);
-        kanjiStrokeAmount.classList.add("kanjiStrokeAmount");
-
-        kanjiCard.appendChild(kanjiTitle);
-        kanjiCard.appendChild(kanjiHiragana);
-        kanjiCard.append(kanjiMeaning);
-        kanjiCard.append(kanjiStrokeAmount);
-        allKanjiContainer.appendChild(kanjiCard);
-
+    allKanjiContainer.appendChild(kanjiCard);
         kanjiCard.addEventListener("click", () => {
             showPopup("Delete or Edit?", "Delete", "editKanji", kanjiTitle.textContent);
         })
-    })
 
     totalKanji.textContent = "Total Kanji: " + kanjiDatabase.length;
-
 }
+
 
 
 // EXPORT DATABASE
@@ -1171,6 +1176,36 @@ function saveKanjiEdits(oldKanji, updatedData) {
 
     localStorage.setItem("kanjiDatabase", JSON.stringify(kanjiDatabase));
 }
+
+// SEARCH FOR KANJI INPUT - UPDATE AS TYPING
+searchForKanji.addEventListener("input", () => {
+    const requestedKanji = searchForKanji.value.trim()
+    filterKanji(requestedKanji); 
+})
+
+
+// HANDLES FILTERING LOGIC
+function filterKanji(query) {
+    const container = document.getElementById("allKanjiContainer");
+    container.innerHTML = "";
+
+    const filtered = [...kanjiDatabase].reverse().filter(entry => {
+        return (
+            entry.kanji.includes(query) ||
+            entry.hiragana.includes(query) ||
+            entry.meaning.toLowerCase().includes(query)
+        );
+    });
+
+    filtered.forEach(renderKanjiCard);
+    
+    totalKanji.textContent = "Total Kanji: " + filtered.length;
+}
+
+
+
+
+
 
 
 

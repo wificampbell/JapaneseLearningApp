@@ -513,9 +513,6 @@ addKanjiPartButton.addEventListener("click", () => {
         //determine if this kanji already exists in the database 
         const existing = getStrokeDirectionsForKanji(kanjiInput.value);
 
-        // clear container
-        strokeContainer.innerHTML = "";
-
         if (existing) {
 
             const strokesExistText = document.createElement("div");

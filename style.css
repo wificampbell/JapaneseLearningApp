@@ -569,6 +569,7 @@ button {
     pointer-events: none;
     text-align: center;
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
+    white-space: pre-line;
 }
 
 .popup.open {

@@ -402,7 +402,7 @@ function checkKanji() {
         }
 
         if (user.length !== expected.length) {
-            showPopup("Incorrect amount of strokes.", "オケ", "displayRandomKanji");
+            showPopup("Answer: " + target.kanji + "\nStrokes Given: " + user.length + "\nExpected Amount: " + expected.length, "オケ", "displayRandomKanji");
             resetStrokeData();
             return;
         }
@@ -416,10 +416,14 @@ function checkKanji() {
         }
     }
 
-    const score =
-        total === 0
-            ? 0
-            : Math.round((correct / total) * 100);
+    let score = 0
+
+    if (total === 0) {
+        score == 0;
+    }
+    else {
+        score = Math.round((correct / total) * 100);
+    }
 
     showPopup("スコア: " + score + "%", "次", "displayRandomKanji");
     resetStrokeData();
@@ -893,9 +897,9 @@ function renderKanjiCard(eachKanji) {
     );
 
     allKanjiContainer.appendChild(kanjiCard);
-        kanjiCard.addEventListener("click", () => {
-            showPopup("Delete or Edit?", "Delete", "editKanji", kanjiTitle.textContent);
-        })
+    kanjiCard.addEventListener("click", () => {
+        showPopup("Delete or Edit?", "Delete", "editKanji", kanjiTitle.textContent);
+    })
 
     totalKanji.textContent = "Total Kanji: " + kanjiDatabase.length;
 }
@@ -1180,7 +1184,7 @@ function saveKanjiEdits(oldKanji, updatedData) {
 // SEARCH FOR KANJI INPUT - UPDATE AS TYPING
 searchForKanji.addEventListener("input", () => {
     const requestedKanji = searchForKanji.value.trim()
-    filterKanji(requestedKanji); 
+    filterKanji(requestedKanji);
 })
 
 
@@ -1198,7 +1202,7 @@ function filterKanji(query) {
     });
 
     filtered.forEach(renderKanjiCard);
-    
+
     totalKanji.textContent = "Total Kanji: " + filtered.length;
 }
 
@@ -1270,6 +1274,7 @@ function showPage(pageToShow) {
     if (pageToShow == displayAllKanjiPage) {
         renderAllKanjiCards();
         document.documentElement.style.setProperty('--pageColor', '#BCD8EC');
+        searchForKanji.value = "";
     }
 }
 

@@ -404,8 +404,13 @@ function checkKanji() {
 
         if (user.length !== expected.length) {
             showPopup("Answer: " + target.kanji + "\nStrokes Given: " + user.length + "\nExpected Amount: " + expected.length, "オケ", "displayRandomKanji");
-            updatedCorrectness = target.correctness - 5;
-            saveKanjiEdits(target.kanji, {correctness: updatedCorrectness});
+            if (!("correctness" in target)) {
+                updatedCorrectness = 0;
+            }
+            else {
+                updatedCorrectness = target.correctness - 15;
+            }
+            saveKanjiEdits(target.kanji, { correctness: updatedCorrectness });
             resetStrokeData();
             return;
         }
@@ -447,7 +452,7 @@ function checkKanji() {
     }
 
     console.log(target, target.correctness, kanjiDatabase);
-    saveKanjiEdits(target.kanji, {correctness: updatedCorrectness});
+    saveKanjiEdits(target.kanji, { correctness: updatedCorrectness });
     resetStrokeData();
 }
 
@@ -921,10 +926,10 @@ function renderKanjiCard(eachKanji) {
 
     totalKanji.textContent = "Total Kanji: " + kanjiDatabase.length;
 
-    let kanjiCardColor = "#ff6a56"; 
+    let kanjiCardColor = "#ff6a56";
 
     if (!("correctness" in eachKanji)) {
-        kanjiCardColor = "#a4a4a4"; 
+        kanjiCardColor = "#a4a4a4";
     }
     if ((eachKanji.correctness ?? 0) >= 70) {
         kanjiCardColor = "#80e5a5";

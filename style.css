@@ -394,7 +394,7 @@ button {
 
 #flashcardCounter{
     margin: 20px 0px -15px 0px;
-    font-size: 20px;
+    font-size: 30px;
     text-align: center;
 }
 
@@ -529,14 +529,14 @@ button {
 }
 
 .kanjiTitle, .kanjiHiragana, .kanjiMeaning, .kanjiStrokeAmount{
-    font-size: 24px;
+    font-size: 30px;
     text-align: center;
-    margin: 0px
+    margin: 0px;
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
-.kanjiTitle, .kanjiHiragana{
-    font-size: 32px;
-    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
+ .kanjiHiragana, .kanjiMeaning, .kanjiStrokeAmount{
+    font-size: 20px;
 }
 
 

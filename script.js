@@ -409,6 +409,9 @@ function checkKanji() {
             }
             else {
                 updatedCorrectness = target.correctness - 15;
+                if (updatedCorrectness < 0){
+                    updatedCorrectness = 0
+                }
             }
             saveKanjiEdits(target.kanji, { correctness: updatedCorrectness });
             resetStrokeData();
@@ -908,9 +911,11 @@ function renderKanjiCard(eachKanji) {
     kanjiMeaning.classList.add("kanjiMeaning");
 
     const kanjiStrokeAmount = document.createElement("h3");
-    kanjiStrokeAmount.textContent =
-        "Strokes: " + getTotalStrokeCount(eachKanji);
+    kanjiStrokeAmount.textContent = "Strokes: " + getTotalStrokeCount(eachKanji);
     kanjiStrokeAmount.classList.add("kanjiStrokeAmount");
+
+    const correctnessPercentage = document.createElement("h3");
+    correctnessPercentage.style.textAlign = "center";
 
     kanjiCard.append(
         kanjiTitle,
@@ -926,21 +931,42 @@ function renderKanjiCard(eachKanji) {
 
     totalKanji.textContent = "Total Kanji: " + kanjiDatabase.length;
 
-    let kanjiCardColor = "#ff6a56";
+    const score = eachKanji.correctness ?? null;
+    let kanjiCardColor = "#a4a4a4";
 
-    if (!("correctness" in eachKanji)) {
+    if (score === null) {
         kanjiCardColor = "#a4a4a4";
+        correctnessPercentage.textContent = "";
     }
-    if ((eachKanji.correctness ?? 0) >= 70) {
-        kanjiCardColor = "#80e5a5";
+    else {
+        correctnessPercentage.textContent = score + "%";
+
+        if (score >= 70) {
+            kanjiCardColor = "#80e5a5";
+        }
+        else if (score >= 45) {
+            kanjiCardColor = "#ffe66b";
+        }
+        else if (score >= 30) {
+            kanjiCardColor = "#ffc868";
+        }
+        else {
+            kanjiCardColor = "#ff6a56";
+        }
     }
-    else if ((eachKanji.correctness ?? 0) >= 45) {
-        kanjiCardColor = "#ffe66b";
-    }
-    else if ((eachKanji.correctness ?? 0) >= 30) {
-        kanjiCardColor = "#ffc868";
-    }
+
+
     kanjiCard.style.backgroundColor = kanjiCardColor;
+
+    kanjiCard.append(
+        kanjiTitle,
+        kanjiHiragana,
+        kanjiMeaning,
+        kanjiStrokeAmount,
+        correctnessPercentage
+    );
+
+    allKanjiContainer.appendChild(kanjiCard);
 }
 
 

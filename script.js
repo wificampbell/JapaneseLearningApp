@@ -586,19 +586,19 @@ function addNewKanji() {
         newKanjiHiragana === "" ||
         newKanjiMeaning === ""
     ) {
-        showPopup("Please Enter All Information", "続く", null);
+        showPopup("Please Enter All Information.", "続く", null);
         return;
     }
 
     //duplicate kanji check
     if (findExistingKanji(newKanji)) {
-        showPopup("This kanji already exists in the database", "OK", null);
+        showPopup("This kanji already exists in the database.", "OK", null);
         return;
     }
 
     //must have at least one part
     if (kanjiPartInputs.length === 0) {
-        showPopup("Please add at least one kanji part", "OK", null);
+        showPopup("Please add at least one kanji part.", "OK", null);
         return;
     }
 
@@ -608,7 +608,7 @@ function addNewKanji() {
         const kanjiChar = part.kanjiInput.value.trim();
 
         if (kanjiChar === "") {
-            showPopup("Kanji part cannot be empty", "OK", null);
+            showPopup("Kanji part cannot be empty.", "OK", null);
             return;
         }
 
@@ -620,11 +620,7 @@ function addNewKanji() {
 
         //if it's a new kanji AND has no strokes, error
         if (!isExistingKanji && !hasStrokes) {
-            showPopup(
-                `Please add stroke directions for: ${kanjiChar}`,
-                "OK",
-                null
-            );
+            showPopup("Please add stroke directions for: " + kanjiChar, "オケ", nul );
             return;
         }
     }
@@ -834,7 +830,7 @@ function renderFlashcard(question, correctAnswer, choices) {
                 flashcardCorrectAnswers++;
             }
             else {
-                showPopup("Incorrect. The current answer is: " + correctAnswer, "次", "makeFlashcards");
+                showPopup("Incorrect.\nThe current answer is: " + correctAnswer, "次", "makeFlashcards");
             }
             flashcardTotalQuestions++;
             updateCounter(flashcardCounter, flashcardTotalQuestions, flashcardCorrectAnswers);
@@ -967,7 +963,7 @@ function importKanjiDatabase(event) {
                 JSON.stringify(importedData)
             )
 
-            showPopup("Kanji Database Imported", "次", null);
+            showPopup("Kanji Database Imported Successfully!", "次", null);
 
             currentKanji = null;
             previousKanji = null;
@@ -977,7 +973,7 @@ function importKanjiDatabase(event) {
         }
 
         catch {
-            showPopup("Error. Please Retry", "オケ", null);
+            showPopup("Error. Please Retry.", "オケ", null);
         };
 
         importKanjiFile.value = "";

@@ -11,8 +11,7 @@ Purple = #DCCCEC
 
 /* -------------------- OVERALL -------------------- */ 
 
-/*@import url('https://fonts.googleapis.com/css2?family=Kaisei+Decol&display=swap');
-*/
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&display=swap');
 
 :root {
     --pageColor: #FFCBE1; 
@@ -26,7 +25,7 @@ body {
     margin: 0px 0px 70px 0px;
     overflow-y: scroll;
     overflow-x: hidden;
-    font-family: "Kaisei Decol", "Arial", sans-serif;
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
     color: black;
 }
 
@@ -42,6 +41,7 @@ button {
     border: none;
     box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.273);
     color: black;
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
 .bottomSpace{
@@ -62,7 +62,7 @@ button {
     background-color: #FFCBE1;
     border-radius: 30px;
     margin-top: 2%;
-    font-family: "Kaisei Decol", "Times New Roman";
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
 
@@ -93,7 +93,7 @@ button {
     margin-bottom: 10px;
     font-size: 90px;
     margin-top: 80px;
-    font-family: "Kaisei Decol", "Times New Roman";
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
 #homePageButtons{
@@ -116,7 +116,7 @@ button {
     border-radius: 30px;
     border: none;
     color: black;
-    font-family: "Kaisei Decol", "Times New Roman";
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
 
@@ -160,7 +160,7 @@ button {
     font-size: 400%;
     margin-bottom: 0px;
     line-height: 1;
-    font-family: "Kaisei Decol";
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
     margin-top: 20px;
     margin-left: 75px;
 
@@ -252,7 +252,7 @@ button {
     border-radius: 15px;
     max-width: 300px;
 
-    font-family: "Kaisei Decol", "Times New Roman";
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
 
@@ -301,11 +301,12 @@ button {
 }
 
 
-.addStrokeButton, .deleteStrokeButton, #newKanjiForm select, .strokeList select, .strokeEditDeleteButton, .saveEditButton{
+.newFormButtons, #newKanjiForm select, .strokeList select, .strokeEditDeleteButton, .saveEditButton{
     background-color: #F9E1AB;
     border-radius: 10px;
     margin-left: 10px;
     font-size: 20px;
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
 .strokeList{
@@ -315,8 +316,9 @@ button {
     margin-bottom: 10px;
 }
 
-.addStrokeButton, .deleteStrokeButton{
+.newFormButtons {
     margin-bottom: 20px;
+    font-size: 18px;
 }
 
 .editContainer {
@@ -386,7 +388,7 @@ button {
     font-size: 64px;
     border-radius: 20px;
     margin: 3vh 15px 0px 15px;
-    font-family: "Kaisei Decol", "Times New Roman";
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
 #flashcardChoices {
@@ -404,7 +406,7 @@ button {
     background-color: #DCCCEC;
     border-radius: 20px;
     font-size: 32px;
-    font-family: "Kaisei Decol", "Times New Roman";
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
 
@@ -425,7 +427,7 @@ button {
 #displayAllKanjiPage h1{
     text-align: center;
     margin-top: 30px;
-    font-family: "Kaisei Decol", "Times New Roman";
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
 #allKanjiContainer{
@@ -452,7 +454,7 @@ button {
 
 .kanjiTitle, .kanjiHiragana{
     font-size: 32px;
-    font-family: "Kaisei Decol", "Times New Roman";
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
 #databaseButton{
@@ -471,7 +473,7 @@ button {
     border-radius: 20px;
     font-size: 22px;
     width: 15%;
-    font-family: "Kaisei Decol", "Times New Roman";
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
 
@@ -506,6 +508,7 @@ button {
     opacity: 0;
     pointer-events: none;
     text-align: center;
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
 .popup.open {
@@ -531,17 +534,31 @@ button {
 #popupTitle{
     font-size: 32px;
     text-align: center;
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
-#popupButton, .editButton{
+#popupButton, .editButton, .deleteButton{
     margin-top: auto;
     font-size: 24px;
     background-color: white;
     color: black;
     border-radius: 20px;
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
+.closePopupButton{
+    width: 5%;
+    box-shadow: none;
+    font-size: 24px;
+    background-color: #BCD8EC;
+    color: black;
+    border-radius: 100px;
+    position: fixed;
+    top: 20px;
+    left: 90%;
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 
+}
 
 
 

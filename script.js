@@ -273,8 +273,6 @@ function setupCanvas(canvas, kanjiIndex) {
             //gets the direction of the current stroke
             const direction = getStrokeDirection(currentStroke);
 
-            console.log("Direction:", direction);
-
             //Displays the strokes on the screen as the user draws
             directionDisplayText = document.createElement("div");
             directionDisplayText.textContent = direction;
@@ -476,14 +474,19 @@ addKanjiPartButton.addEventListener("click", () => {
     const strokeContainer = document.createElement("div");
 
     const addStrokeButton = document.createElement("button");
-    addStrokeButton.classList.add("addStrokeButton");
+    addStrokeButton.classList.add("newFormButtons");
     addStrokeButton.type = "button";
     addStrokeButton.textContent = "Add Stroke";
 
     const deleteStrokeButton = document.createElement("button");
-    deleteStrokeButton.classList.add("deleteStrokeButton");
+    deleteStrokeButton.classList.add("newFormButtons");
     deleteStrokeButton.type = "button";
     deleteStrokeButton.textContent = "Delete Stroke";
+
+    const deleteRowButton = document.createElement("button");
+    deleteRowButton.classList.add("newFormButtons");
+    deleteRowButton.type = "button";
+    deleteRowButton.textContent = "Delete Row";
 
     const directions = [
         "top-bottom",
@@ -533,9 +536,14 @@ addKanjiPartButton.addEventListener("click", () => {
         }
     });
 
+    deleteRowButton.addEventListener("click", () => {
+        box.remove();
+    });
+
     box.appendChild(kanjiInput);
     box.appendChild(addStrokeButton);
     box.appendChild(deleteStrokeButton);
+    box.appendChild(deleteRowButton);
     box.appendChild(strokeContainer);
 
     kanjiPartsContainer.appendChild(box);
@@ -559,16 +567,31 @@ function addNewKanji() {
     newKanjiHiragana = document.getElementById("newKanjiHiragana").value.trim();
     newKanjiMeaning = document.getElementById("newKanjiMeaning").value.trim();
 
+    //empty fields checks
     if (newKanji === "" || newKanjiHiragana === "" || newKanjiMeaning === "") {
         showPopup("Please Enter All Information", "続く", null)
         return;
     }
 
-    const kanjiParts = kanjiPartInputs.map(part => {
+    //Cleaning up kanji parts
+    let kanjiParts = kanjiPartInputs.filter(part => {
+        //remove blank kanji names
+        if (part.kanjiInput.value.trim() === "") {
+            return false;
+        }
+        //remove parts with no strokes
+        if (part.strokeSelects.length === 0) {
+            return false;
+        }
+        return true;
+    })
+
+    //transforms every kanji part input into an object to add to database
+    kanjiParts = kanjiParts.map(part => {
         const existing = findExistingKanji(part.kanjiInput.value);
 
+        //reuse existing stroke data if exists
         if (existing) {
-            // reuse existing stroke data
             const existingPart = existing.parts.find(p =>
                 p.kanji === part.kanjiInput.value
 
@@ -579,6 +602,7 @@ function addNewKanji() {
             };
         }
 
+        //array of all the strokes of the kanji
         const strokeDirections = part.strokeSelects.map(sel => sel.value);
 
         return {
@@ -587,6 +611,7 @@ function addNewKanji() {
         };
     });
 
+    //creates the final kanji word objet 
     const entry = {
         kanji: newKanji,
         hiragana: newKanjiHiragana,
@@ -829,7 +854,6 @@ function renderAllKanjiCards() {
     })
 
     totalKanji.textContent = "Total Kanji: " + kanjiDatabase.length;
-    console.log(totalKanji.textContent);
 
 }
 
@@ -861,6 +885,7 @@ function exportKanjiDatabase() {
 // IMPORT DATABASE
 
 importDatabaseButton.addEventListener("click", () => {
+    importKanjiFile.value = "";
     importKanjiFile.click();
 });
 
@@ -868,8 +893,9 @@ importDatabaseButton.addEventListener("click", () => {
 importKanjiFile.addEventListener("change", importKanjiDatabase);
 
 function importKanjiDatabase(event) {
+    console.log("CHANGE");
     //get the file (first selected file)
-    const file = event.target.files[0];
+    const file = event.target.files?.[0];
 
     if (!file) {
         return;
@@ -884,20 +910,30 @@ function importKanjiDatabase(event) {
             if (!Array.isArray(importedData)) {
                 throw new Error("Invalid format");
             }
+            console.log("IMPORTED DATA: " + importedData);
             //replace database with file database 
             kanjiDatabase = importedData;
+            console.log("UPDATED KANJIDATABASE DATA: " + kanjiDatabase);
             localStorage.setItem(
                 "kanjiDatabase",
-                JSON.stringify(kanjiDatabase)
+                JSON.stringify(importedData)
             )
 
             showPopup("Kanji Database Imported", "次", null);
+
+            currentKanji = null;
+            previousKanji = null;
+            currentDisplayedKanji = null;
+
             renderAllKanjiCards();
         }
 
         catch {
             showPopup("Error. Please Retry", "オケ", null);
         };
+
+        importKanjiFile.value = "";
+
     }
     //begins file processing
     reader.readAsText(file);
@@ -1056,8 +1092,7 @@ function openEditForm(kanjiName) {
 
         localStorage.setItem("kanjiDatabase", JSON.stringify(kanjiDatabase));
 
-        popup.classList.remove("open");
-        popup.classList.add("close");
+        closePopup();
     });
 
     container.appendChild(saveButton);
@@ -1077,8 +1112,6 @@ function saveKanjiEdits(oldKanji, updatedData) {
     };
 
     localStorage.setItem("kanjiDatabase", JSON.stringify(kanjiDatabase));
-
-    console.log("Updated kanji:", kanjiDatabase[index]);
 }
 
 
@@ -1095,6 +1128,11 @@ function showPage(pageToShow) {
 
     if (!pageToShow) {
         pageToShow = homePage;
+    }
+
+    if (popup.classList.contains("open")) {
+        popup.classList.remove("open");
+        popup.classList.add("immediateclose");
     }
 
     const pages = [homePage, kanjiWritingPage, uploadNewKanjiPage, flashcardPage, displayAllKanjiPage];
@@ -1155,40 +1193,51 @@ function getRandomKanji() {
 
 // SHOWS POPUPS THROUGHOUT THE WEBSITE
 function showPopup(text, buttonText, buttonFunction, payload = null) {
-
     popup.innerHTML = "";
 
     popup.classList.remove("close");
+    popup.classList.remove("immediateclose");
     popup.classList.add("open");
 
     const title = document.createElement("h2");
     title.textContent = text;
-
-    popupButton.textContent = buttonText;
-
     popup.appendChild(title);
 
-    // remove old edit button logic handled naturally now
+    //create a new button every time to prevent old buttons from firing 
+    const popupButton = document.createElement("button");
+    popupButton.classList.add("deleteButton");
+    popupButton.textContent = buttonText;
 
+
+    // remove old edit button logic handled naturally now
     if (buttonFunction === "editKanji") {
+
+        const closeButton = document.createElement("button");
+        closeButton.textContent = "X";
+        closeButton.classList.add("closePopupButton");
+
+        closeButton.addEventListener("click", () => {
+            closePopup();
+        });
 
         const editButton = document.createElement("button");
         editButton.textContent = "Edit";
         editButton.classList.add("editButton");
 
-        popup.appendChild(editButton);
-
         editButton.addEventListener("click", () => {
             openEditForm(payload);
         });
+
+        popup.appendChild(editButton);
+        popup.appendChild(closeButton);
+
     }
 
     popup.appendChild(popupButton);
 
     popupButton.addEventListener("click", () => {
 
-        popup.classList.remove("open");
-        popup.classList.add("close");
+        closePopup();
 
         if (buttonFunction === "displayRandomKanji") {
             displayRandomKanji();
@@ -1201,17 +1250,23 @@ function showPopup(text, buttonText, buttonFunction, payload = null) {
         if (buttonFunction === "editKanji") {
             deleteKanjiByName(payload);
             renderAllKanjiCards();
+            return;
         }
     });
 }
+
+
+function closePopup() {
+    popup.classList.remove("open");
+    popup.classList.remove("immediateclose");
+    popup.classList.add("close");
+}
+
 
 // UPDATES FLASHCARD AND WRITING COUNTERS
 function updateCounter(counterElement, totalQuestions, totalCorrect) {
     counterElement.textContent = totalCorrect + "/" + totalQuestions;
 }
-
-
-
 
 
 

@@ -53,8 +53,6 @@
             </div>
         </div>
 
-        <div class="bottomSpace"></div>
-
     </section>
 
     <!--------------------NEW KANJI PAGE -------------------->
@@ -85,7 +83,7 @@
 
     <!-------------------- FLASHCARD PAGE -------------------->
     <section id="flashcardPage">
-        <h3 id = "flashcardCounter">0/0</h3>
+        <h3 id="flashcardCounter">0/0</h3>
         <div id="flashcardContainer">
             <div id="flashcardQuestion"></div>
             <div id="flashcardChoices"></div>
@@ -97,13 +95,15 @@
     <section id="displayAllKanjiPage">
         <h1>全部の漢字</h1>
         <h1 id="totalKanji">Total Kanji: 0</h1>
-        <input id = "searchForKanji" placeholder="Search Kanji...">
-        <div id="databaseButton">
-            <button id="exportDatabaseButton">Export Database</button>
-            <button id="importDatabaseButton">Import Database</button>
-            <input type=file id="importKanjiFile" accept=".json" hidden>
+        <input id="searchForKanji" placeholder="Search Kanji...">
+        <div id="kanjiCardsAndButtons">
+            <div id="allKanjiContainer"></div>
+             <div id="databaseButton">
+                <button id="exportDatabaseButton">Export<br>Database</button>
+                <button id="importDatabaseButton">Import<br>Database</button>
+                <input type=file id="importKanjiFile" accept=".json" hidden>
+            </div>
         </div>
-        <div id="allKanjiContainer"></div>
         <div class="bottomSpace"></div>
     </section>
 
@@ -111,7 +111,7 @@
     <!-------------------- POPUPS -------------------->
     <section class="popup">
         <div id="popupTitle"></div>
-                <h3>X</h3>
+        <h3>X</h3>
 
         <button class="formButton" id="popupButton"></button>
     </section>

@@ -21,7 +21,7 @@ const hintText = document.getElementById("hintText");
 const hintButton = document.getElementById("hint");
 const displayDirections = document.getElementById("displayDirections");
 
-
+let hintPressed = 0;
 let isDrawing = false;
 // Stores all completed strokes
 let strokes = [];
@@ -302,6 +302,7 @@ function resetStrokeData() {
         return;
     }
 
+    hintPressed = false;
     currentDisplayedKanji.userStrokes = [];
 
     currentDisplayedKanji.parts.forEach((part, index) => {
@@ -373,6 +374,7 @@ submitKanji.addEventListener("click", () => {
 });
 
 hintButton.addEventListener("click", () => {
+    hintPressed = true;
     kanjiAndHint = document.getElementById("kanjiAndHint");
     hintText.classList.remove("hidden");
     hintText.textContent = currentDisplayedKanji.hiragana;
@@ -408,7 +410,7 @@ function checkKanji() {
                 updatedCorrectness = 0;
             }
             else {
-                updatedCorrectness = target.correctness - 15;
+                updatedCorrectness = target.correctness - 15 - (hintPressed? 5 : 0);
                 if (updatedCorrectness < 0){
                     updatedCorrectness = 0
                 }
@@ -441,7 +443,7 @@ function checkKanji() {
             updatedCorrectness = score;
         }
         else {
-            updatedCorrectness = (target.correctness + score) / 2;
+            updatedCorrectness = (target.correctness + score) / 2 - (hintPressed? 5 : 0);
         }
     }
     else {
@@ -450,7 +452,7 @@ function checkKanji() {
             updatedCorrectness = 100;
         }
         else {
-            updatedCorrectness = (target.correctness + score) / 2;
+            updatedCorrectness = (target.correctness + score) / 2 - (hintPressed? 5 : 0);
         }
     }
 

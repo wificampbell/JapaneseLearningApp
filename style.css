@@ -157,9 +157,9 @@ button {
 
 #kanjiWritingPage h1{
     text-align: center;
-    font-size: 400%;
-    margin-bottom: 0px;
-    max-height: 64px;
+    font-size: 50px;
+    margin-bottom: 30px;
+    max-height: 50px;
     line-height: 1;
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
     margin-top: 20px;

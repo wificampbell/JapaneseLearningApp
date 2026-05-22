@@ -440,6 +440,7 @@ button {
     margin: 3vh 15px 0px 15px;
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
     padding: 40px;
+    max-height: 30vh;
 }
 
 #flashcardChoices {
@@ -450,16 +451,16 @@ button {
     margin-top: 30px;
     gap: 20px;
     padding: 10px;
-    font-size: clamp(20px, 1.5vh, 24px);
-    min-height: 20vh;
-    max-height: 20vh;
+    font-size: clamp(20px, 5vh, 24px);
+    min-height: 25vh;
+    max-height: 25vh;
     
 }
 
 .choiceButton{
     background-color: #DCCCEC;
     border-radius: 20px;
-    font-size: clamp(24px, 2vh, 32px);
+    font-size: clamp(24px, 6vh, 48px);
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 

@@ -423,7 +423,7 @@ button {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 20px;
     margin: 40px;
     margin-top: 10px
 }
@@ -448,7 +448,6 @@ button {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    margin-top: 30px;
     gap: 20px;
     padding: 10px;
     font-size: clamp(20px, 5vh, 24px);
@@ -460,7 +459,7 @@ button {
 .choiceButton{
     background-color: #DCCCEC;
     border-radius: 20px;
-    font-size: clamp(24px, 6vh, 48px);
+    font-size: clamp(24px, 6vh, 30px);
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 

@@ -435,10 +435,11 @@ button {
     justify-content: center;
     text-align: center;
     background-color: #DCCCEC;
-    font-size: clamp(32px, 2vh, 64px);
+    font-size: clamp(32px, 6vh, 64px);
     border-radius: 20px;
     margin: 3vh 15px 0px 15px;
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
+    padding: 40px;
 }
 
 #flashcardChoices {

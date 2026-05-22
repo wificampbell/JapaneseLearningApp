@@ -647,7 +647,6 @@ newKanjiForm.addEventListener("submit", (e) => {
     addNewKanji();
 })
 
-
 // ADDING A NEW KANJI AND ITS DETAILS
 function addNewKanji() {
 
@@ -657,55 +656,58 @@ function addNewKanji() {
 
     // -------------------- VALIDATION -------------------- //
 
-    if (!newKanji || !newKanjiHiragana || !newKanjiMeaning) {
+    // empty field check
+    if (
+        newKanji === "" ||
+        newKanjiHiragana === "" ||
+        newKanjiMeaning === ""
+    ) {
         showPopup("Please Enter All Information.", "続く", null);
         return;
     }
 
+    //duplicate kanji check
     if (findExistingKanji(newKanji)) {
         showPopup("This kanji already exists in the database.", "OK", null);
         return;
     }
 
+    //must have at least one part
     if (kanjiPartInputs.length === 0) {
         showPopup("Please add at least one kanji part.", "OK", null);
         return;
     }
 
-    // validate each part
+    //validate each part before building data
     for (const part of kanjiPartInputs) {
 
         const kanjiChar = part.kanjiInput.value.trim();
 
-        if (!kanjiChar) {
+        if (kanjiChar === "") {
             showPopup("Kanji part cannot be empty.", "OK", null);
             return;
         }
 
         const isExistingKanji = findExistingKanji(kanjiChar);
 
-        const partBox = part.kanjiInput.closest(".kanjiPartBox");
+        const hasStrokes =
+            part.strokeSelects.length > 0 &&
+            part.strokeSelects.every(sel => sel.value !== "");
 
-        const strokeRows = partBox.querySelectorAll(".strokeEditDeleteButton");
-
-        const hasStrokes = strokeRows.length > 0;
-
+        //if it's a new kanji AND has no strokes, error
         if (!isExistingKanji && !hasStrokes) {
-            showPopup("Please add stroke directions for: " + kanjiChar,"オケ", null );
+            showPopup("Please add stroke directions for: " + kanjiChar, "オケ", null);
             return;
         }
     }
 
-    // -------------------- BUILD DATA -------------------- //
+    //build the word's kanji parts
 
     const kanjiParts = kanjiPartInputs.map(part => {
 
         const kanjiChar = part.kanjiInput.value.trim();
 
         const existing = findExistingKanji(kanjiChar);
-
-        const partBox = part.kanjiInput.closest(".kanjiPartBox");
-        const strokeRows = partBox.querySelectorAll(".strokeEditDeleteButton");
 
         // reuse strokes if kanji already exists
         if (existing) {
@@ -715,19 +717,14 @@ function addNewKanji() {
             };
         }
 
-        // otherwise read current UI state
-        const strokeDirections = Array.from(strokeRows)
-            .map(btn => btn.parentElement.querySelector("select")?.value)
-            .filter(v => v && v.trim() !== "");
-
+        // otherwise use user input
         return {
             kanji: kanjiChar,
-            strokeDirections
+            strokeDirections: part.strokeSelects.map(sel => sel.value)
         };
     });
 
-    // -------------------- CREATE ENTRY -------------------- //
-
+    //create entry
     const entry = {
         kanji: newKanji,
         hiragana: newKanjiHiragana,
@@ -737,17 +734,18 @@ function addNewKanji() {
 
     kanjiDatabase.push(entry);
 
-    localStorage.setItem("kanjiDatabase", JSON.stringify(kanjiDatabase));
+    localStorage.setItem(
+        "kanjiDatabase",
+        JSON.stringify(kanjiDatabase)
+    );
 
     console.log("Saved word:", entry);
 
     showPopup("New Kanji Saved: " + entry.kanji, "次", null);
 
-    // -------------------- RESET UI -------------------- //
-
+    //reset ui
     kanjiPartsContainer.innerHTML = "";
     kanjiPartInputs = [];
-
     document.getElementById("newKanji").value = "";
     document.getElementById("newKanjiHiragana").value = "";
     document.getElementById("newKanjiMeaning").value = "";

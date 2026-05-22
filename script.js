@@ -15,7 +15,8 @@ const kanjiWritingPage = document.getElementById("kanjiWritingPage");
 const randomKanjiDisplay = document.getElementById("randomKanjiDisplay");
 const kanjiCanvasContainer = document.getElementById("kanjiCanvasContainer")
 const clearCanvas = document.getElementById("clearCanvas");
-const canvasButtons = document.getElementById("canvasButtons")
+const canvasButtons = document.getElementById("canvasButtons");
+const showStrokesHelpImageButton = document.getElementById("showStrokesHelpImageButton");
 const submitKanji = document.getElementById("submitKanji");
 const hintText = document.getElementById("hintText");
 const hintButton = document.getElementById("hint");
@@ -145,6 +146,7 @@ viewAllKanjiNavigationButton.addEventListener("click", () => {
     showPage(displayAllKanjiPage)
 })
 
+let showStrokesHelpImageButtonPressed = false;
 
 // -------------------- KANJI WRITING PAGE -------------------- //
 
@@ -152,6 +154,7 @@ viewAllKanjiNavigationButton.addEventListener("click", () => {
 function createKanjiCanvases(wordData) {
 
     kanjiCanvasContainer.innerHTML = "";
+    displayDirections.innerHTML = ""
 
     // save currently displayed word
     currentDisplayedKanji = wordData;
@@ -172,6 +175,18 @@ function createKanjiCanvases(wordData) {
         //each canvas/actual drawing interface 
         const canvas = document.createElement("canvas");
         canvas.classList.add("kanjiCanvas");
+
+
+        if (showStrokesHelpImageButtonPressed) {
+            box.classList.add("withStroke");
+            box.style.backgroundImage = `url("KanjiStrokes/${part.kanji}.png")`;
+            const overlay = document.createElement("div");
+            overlay.id = "opacity";
+            box.appendChild(overlay);
+        }
+        else {
+            box.classList.remove("withStroke");
+        }
 
         box.appendChild(canvas);
         kanjiCanvasContainer.appendChild(box);
@@ -197,10 +212,18 @@ function initializeCanvas(canvas, ctx) {
     //apply correct scaling 
     ctx.scale(dpr, dpr);
 
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.strokeStyle = "black";
+    if (showStrokesHelpImageButtonPressed) {
+        ctx.lineWidth = 10;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "black";
+    }
+    else {
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "black";
+    }
 }
 
 
@@ -378,8 +401,12 @@ hintButton.addEventListener("click", () => {
     kanjiAndHint = document.getElementById("kanjiAndHint");
     hintText.classList.remove("hidden");
     hintText.textContent = currentDisplayedKanji.hiragana;
+});
 
-})
+showStrokesHelpImageButton.addEventListener("click", () => {
+    showStrokesHelpImageButtonPressed = true;
+    createKanjiCanvases(currentDisplayedKanji);
+});
 
 
 // Handles checking whether the kanji the user written is correct
@@ -394,6 +421,23 @@ function checkKanji() {
     let correct = 0;
     let total = 0;
     let updatedCorrectness;
+
+    if (showStrokesHelpImageButtonPressed) {
+        if (!("correctness" in target)) {
+            updatedCorrectness = 0;
+        }
+        else {
+            updatedCorrectness = target.correctness - 50;
+            if (updatedCorrectness < 0) {
+                updatedCorrectness = 0
+            }
+        }
+        saveKanjiEdits(target.kanji, { correctness: updatedCorrectness });
+        showStrokesHelpImageButtonPressed = false;
+        resetStrokeData();
+        displayRandomKanji();
+        return;
+    }
 
     for (let i = 0; i < target.parts.length; i++) {
         const expected = target.parts[i].strokeDirections;
@@ -410,12 +454,13 @@ function checkKanji() {
                 updatedCorrectness = 0;
             }
             else {
-                updatedCorrectness = target.correctness - 15 - (hintPressed? 5 : 0);
-                if (updatedCorrectness < 0){
+                updatedCorrectness = target.correctness - 15 - (hintPressed ? 5 : 0);
+                if (updatedCorrectness < 0) {
                     updatedCorrectness = 0
                 }
             }
             saveKanjiEdits(target.kanji, { correctness: updatedCorrectness });
+            showStrokesHelpImageButtonPressed = false;
             resetStrokeData();
             return;
         }
@@ -443,7 +488,7 @@ function checkKanji() {
             updatedCorrectness = score;
         }
         else {
-            updatedCorrectness = (target.correctness + score) / 2 - (hintPressed? 5 : 0);
+            updatedCorrectness = (target.correctness + score) / 2 - (hintPressed ? 5 : 0);
         }
     }
     else {
@@ -452,12 +497,12 @@ function checkKanji() {
             updatedCorrectness = 100;
         }
         else {
-            updatedCorrectness = (target.correctness + score) / 2 - (hintPressed? 5 : 0);
+            updatedCorrectness = (target.correctness + score) / 2 - (hintPressed ? 5 : 0);
         }
     }
 
-    console.log(target, target.correctness, kanjiDatabase);
     saveKanjiEdits(target.kanji, { correctness: updatedCorrectness });
+    showStrokesHelpImageButtonPressed = false;
     resetStrokeData();
 }
 
@@ -612,58 +657,55 @@ function addNewKanji() {
 
     // -------------------- VALIDATION -------------------- //
 
-    // empty field check
-    if (
-        newKanji === "" ||
-        newKanjiHiragana === "" ||
-        newKanjiMeaning === ""
-    ) {
+    if (!newKanji || !newKanjiHiragana || !newKanjiMeaning) {
         showPopup("Please Enter All Information.", "続く", null);
         return;
     }
 
-    //duplicate kanji check
     if (findExistingKanji(newKanji)) {
         showPopup("This kanji already exists in the database.", "OK", null);
         return;
     }
 
-    //must have at least one part
     if (kanjiPartInputs.length === 0) {
         showPopup("Please add at least one kanji part.", "OK", null);
         return;
     }
 
-    //validate each part before building data
+    // validate each part
     for (const part of kanjiPartInputs) {
 
         const kanjiChar = part.kanjiInput.value.trim();
 
-        if (kanjiChar === "") {
+        if (!kanjiChar) {
             showPopup("Kanji part cannot be empty.", "OK", null);
             return;
         }
 
         const isExistingKanji = findExistingKanji(kanjiChar);
 
-        const hasStrokes =
-            part.strokeSelects.length > 0 &&
-            part.strokeSelects.every(sel => sel.value !== "");
+        const partBox = part.kanjiInput.closest(".kanjiPartBox");
 
-        //if it's a new kanji AND has no strokes, error
+        const strokeRows = partBox.querySelectorAll(".strokeEditDeleteButton");
+
+        const hasStrokes = strokeRows.length > 0;
+
         if (!isExistingKanji && !hasStrokes) {
-            showPopup("Please add stroke directions for: " + kanjiChar, "オケ", nul);
+            showPopup("Please add stroke directions for: " + kanjiChar,"オケ", null );
             return;
         }
     }
 
-    //build the word's kanji parts
+    // -------------------- BUILD DATA -------------------- //
 
     const kanjiParts = kanjiPartInputs.map(part => {
 
         const kanjiChar = part.kanjiInput.value.trim();
 
         const existing = findExistingKanji(kanjiChar);
+
+        const partBox = part.kanjiInput.closest(".kanjiPartBox");
+        const strokeRows = partBox.querySelectorAll(".strokeEditDeleteButton");
 
         // reuse strokes if kanji already exists
         if (existing) {
@@ -673,14 +715,19 @@ function addNewKanji() {
             };
         }
 
-        // otherwise use user input
+        // otherwise read current UI state
+        const strokeDirections = Array.from(strokeRows)
+            .map(btn => btn.parentElement.querySelector("select")?.value)
+            .filter(v => v && v.trim() !== "");
+
         return {
             kanji: kanjiChar,
-            strokeDirections: part.strokeSelects.map(sel => sel.value)
+            strokeDirections
         };
     });
 
-    //create entry
+    // -------------------- CREATE ENTRY -------------------- //
+
     const entry = {
         kanji: newKanji,
         hiragana: newKanjiHiragana,
@@ -690,18 +737,17 @@ function addNewKanji() {
 
     kanjiDatabase.push(entry);
 
-    localStorage.setItem(
-        "kanjiDatabase",
-        JSON.stringify(kanjiDatabase)
-    );
+    localStorage.setItem("kanjiDatabase", JSON.stringify(kanjiDatabase));
 
     console.log("Saved word:", entry);
 
     showPopup("New Kanji Saved: " + entry.kanji, "次", null);
 
-    //reset ui
+    // -------------------- RESET UI -------------------- //
+
     kanjiPartsContainer.innerHTML = "";
     kanjiPartInputs = [];
+
     document.getElementById("newKanji").value = "";
     document.getElementById("newKanjiHiragana").value = "";
     document.getElementById("newKanjiMeaning").value = "";
@@ -1008,7 +1054,6 @@ importDatabaseButton.addEventListener("click", () => {
 importKanjiFile.addEventListener("change", importKanjiDatabase);
 
 function importKanjiDatabase(event) {
-    console.log("CHANGE");
     //get the file (first selected file)
     const file = event.target.files?.[0];
 
@@ -1025,10 +1070,8 @@ function importKanjiDatabase(event) {
             if (!Array.isArray(importedData)) {
                 throw new Error("Invalid format");
             }
-            console.log("IMPORTED DATA: " + importedData);
             //replace database with file database 
             kanjiDatabase = importedData;
-            console.log("UPDATED KANJIDATABASE DATA: " + kanjiDatabase);
             localStorage.setItem(
                 "kanjiDatabase",
                 JSON.stringify(importedData)
@@ -1311,6 +1354,8 @@ function showPage(pageToShow) {
     // ------ KANJI WRITING PAGE
     if (pageToShow == kanjiWritingPage) {
         hintText.classList.add("hidden");
+        hintPressed = false;
+        showStrokesHelpImageButtonPressed = false;
         displayRandomKanji();
         resetStrokeData();
         document.documentElement.style.setProperty('--pageColor', '#D6E5BD');

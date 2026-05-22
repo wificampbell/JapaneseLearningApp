@@ -45,11 +45,14 @@
         <div id="displayDirections"></div>
 
         <div id="canvasAndButtons">
-            <div id="kanjiCanvasContainer"> </div>
+            <div id="kanjiCanvasContainer">
+                <div id="opacity"></div>
+            </div>
             <div id="canvasButtons">
-                <button id="hint">Hint</button>
-                <button id="clearCanvas">Clear</button>
                 <button id="submitKanji">Check</button>
+                <button id="showStrokesHelpImageButton">Strokes</button>
+                <button id="hint">Hiragana</button>
+                <button id="clearCanvas">Clear</button>
             </div>
         </div>
 
@@ -98,7 +101,7 @@
         <input id="searchForKanji" placeholder="Search Kanji...">
         <div id="kanjiCardsAndButtons">
             <div id="allKanjiContainer"></div>
-             <div id="databaseButton">
+            <div id="databaseButton">
                 <button id="exportDatabaseButton">Export<br>Database</button>
                 <button id="importDatabaseButton">Import<br>Database</button>
                 <input type=file id="importKanjiFile" accept=".json" hidden>

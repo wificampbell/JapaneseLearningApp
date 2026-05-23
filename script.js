@@ -404,7 +404,7 @@ hintButton.addEventListener("click", () => {
 });
 
 showStrokesHelpImageButton.addEventListener("click", () => {
-    showStrokesHelpImageButtonPressed = true;
+    showStrokesHelpImageButtonPressed = !showStrokesHelpImageButtonPressed;
     createKanjiCanvases(currentDisplayedKanji);
 });
 

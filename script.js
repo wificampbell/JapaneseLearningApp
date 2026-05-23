@@ -1350,17 +1350,42 @@ function filterKanji(query) {
 
 
 
-
-
 // -------------------- STORY PAGE -------------------- // 
 generateStoryButton.addEventListener("click", () => {
-    generateStory();
+    importedStoryFile.value = "";
+    importedStoryFile.click();
 })
 
-function generateStory() {
-    const jsonString = prompt("Paste story JSON here: ");
-    const data = JSON.parse(jsonString);
-    renderStory(data);
+
+importedStoryFile.addEventListener("change", generateStory);
+
+function generateStory(event) {
+
+    //get the file (first selected file)
+    const file = event.target.files?.[0];
+
+    if (!file) {
+        return;
+    }
+    //browser tool for reading files
+    const reader = new FileReader();
+    //once file has been fully read
+    reader.onload = function (e) {
+        try {
+            const importedStoryData = JSON.parse(e.target.result);
+            //makes sure file is correct format
+            if (!importedStoryData.story ||!Array.isArray(importedStoryData.questions)) {
+                throw new Error("Invalid format");
+            }
+            renderStory(importedStoryData);
+        }
+        catch {
+            throw new Error("Error, please try again.");
+        }
+    }
+
+    reader.readAsText(file);
+    importStoryFile.value = "";
 }
 
 function renderStory(data) {
@@ -1376,7 +1401,7 @@ function renderStory(data) {
     storyText.textContent = data.story;
     writtenStoryContainer.appendChild(storyText);
 
-    let mcQuestionNumber = 0; 
+    let mcQuestionNumber = 0;
 
     // QUESTIONS
     data.questions.forEach((currentQuestion, index) => {
@@ -1479,9 +1504,9 @@ function showPage(pageToShow) {
         document.documentElement.style.setProperty('--pageColor', '#BCD8EC');
         searchForKanji.value = "";
     }
-    
-     // ------ STORY PAGE
-    if (pageToShow == storyPage){
+
+    // ------ STORY PAGE
+    if (pageToShow == storyPage) {
         document.documentElement.style.setProperty('--pageColor', '#e7c3ad');
     }
 }

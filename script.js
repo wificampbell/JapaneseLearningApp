@@ -8,6 +8,7 @@ const writeKanjiPageNavigationButton = document.getElementById("writeKanjiPageNa
 const addNewKanjiPageNavigationButton = document.getElementById("addNewKanjiPageNavigationButton");
 const flashcardPageNavigationButton = document.getElementById("flashcardPageNavigationButton");
 const viewAllKanjiNavigationButton = document.getElementById("viewAllKanjiNavigationButton");
+const storyPageNavigationButton = document.getElementById("storyPageNavigationButton");
 
 // ーーーーーーーーーーーーーー KANJI WRITING PAGE
 
@@ -37,6 +38,7 @@ let currentKanji = null;
 
 let writingCorrectAnswers = 0;
 let writingTotalAnswers = 0;
+let showStrokesHelpImageButtonPressed = false;
 
 // ーーーーーーーーーーーーーー ADD NEW KANJI PAGE
 const uploadNewKanjiPage = document.getElementById("uploadNewKanjiPage");
@@ -60,6 +62,7 @@ const kanjiWritingButton = document.getElementById("kanjiWritingButton");
 const uploadNewKanjiButton = document.getElementById("uploadNewKanjiButton");
 const flashcardButton = document.getElementById("flashcardButton");
 const allKanjiButton = document.getElementById("allKanjiButton");
+const storyPageButton = document.getElementById("storyPageButton");
 
 
 // ーーーーーーーーーーーーーー FLASHCARD PAGE
@@ -80,6 +83,10 @@ const exportDatabaseButton = document.getElementById("exportDatabaseButton");
 const importDatabaseButton = document.getElementById("importDatabaseButton");
 const totalKanji = document.getElementById("totalKanji");
 const searchForKanji = document.getElementById("searchForKanji");
+
+// ーーーーーーーーーーーーーー STORY PAGE
+const storyPage = document.getElementById("storyPage");
+const generateStoryButton = document.getElementById("generateStoryButton");
 
 // ーーーーーーーーーーーーーー POPUP
 
@@ -146,7 +153,10 @@ viewAllKanjiNavigationButton.addEventListener("click", () => {
     showPage(displayAllKanjiPage)
 })
 
-let showStrokesHelpImageButtonPressed = false;
+storyPageNavigationButton.addEventListener("click", () => {
+    showPage(storyPage);
+})
+
 
 // -------------------- KANJI WRITING PAGE -------------------- //
 
@@ -761,20 +771,23 @@ function addNewKanji() {
 // -------------------- HOME PAGE -------------------- // 
 kanjiWritingButton.addEventListener("click", () => {
     showPage(kanjiWritingPage)
-})
+});
 
 uploadNewKanjiButton.addEventListener("click", () => {
     showPage(uploadNewKanjiPage)
-})
+});
 
 flashcardButton.addEventListener("click", () => {
     showPage(flashcardPage)
-})
+});
 
 allKanjiButton.addEventListener("click", () => {
     showPage(displayAllKanjiPage)
-})
+});
 
+storyPageButton.addEventListener("click", () => {
+    showPage(storyPage)
+});
 
 
 
@@ -1160,7 +1173,7 @@ function openEditForm(kanjiName) {
             //remove from entry data
             entry.parts.splice(partIndex, 1);
             //save updates
-            saveKanjiEdits(entry.kanji, {parts: entry.parts});
+            saveKanjiEdits(entry.kanji, { parts: entry.parts });
             //remove UI
             partBox.remove();
         });
@@ -1339,6 +1352,67 @@ function filterKanji(query) {
 
 
 
+// -------------------- STORY PAGE -------------------- // 
+generateStoryButton.addEventListener("click", () => {
+    generateStory();
+})
+
+function generateStory() {
+    const jsonString = prompt("Paste story JSON here: ");
+    const data = JSON.parse(jsonString);
+    renderStory(data);
+}
+
+function renderStory(data) {
+
+    const writtenStoryContainer = document.getElementById("writtenStory");
+    const multipleChoiceContainer = document.getElementById("multipleChoiceContainer");
+
+    writtenStoryContainer.innerHTML = "";
+    multipleChoiceContainer.innerHTML = "";
+
+    // STORY
+    const storyText = document.createElement("p");
+    storyText.textContent = data.story;
+    writtenStoryContainer.appendChild(storyText);
+
+    let mcQuestionNumber = 0; 
+
+    // QUESTIONS
+    data.questions.forEach((currentQuestion, index) => {
+        mcQuestionNumber++;
+
+        const block = document.createElement("div");
+        block.classList.add("questionBlock");
+
+        const questionText = document.createElement("h3");
+        questionText.textContent = mcQuestionNumber + ". " + currentQuestion.question;
+
+        block.appendChild(questionText);
+
+        currentQuestion.choices.forEach((choice, choiceIndex) => {
+
+            const btn = document.createElement("button");
+            btn.textContent = choice;
+
+            btn.addEventListener("click", () => {
+
+                if (choiceIndex === currentQuestion.answer) {
+                    showPopup("正解", "次", null);
+                    btn.style.backgroundColor = "#D6E5BD";
+                } else {
+                    showPopup("違います", "次", null);
+                    btn.style.backgroundColor = "salmon";
+                }
+            });
+
+            block.appendChild(btn);
+        });
+
+        multipleChoiceContainer.appendChild(block);
+    });
+}
+
 
 
 
@@ -1359,7 +1433,7 @@ function showPage(pageToShow) {
         popup.classList.add("immediateclose");
     }
 
-    const pages = [homePage, kanjiWritingPage, uploadNewKanjiPage, flashcardPage, displayAllKanjiPage];
+    const pages = [homePage, kanjiWritingPage, uploadNewKanjiPage, flashcardPage, displayAllKanjiPage, storyPage];
 
     pages.forEach(page => {
         page.style.display = "none";
@@ -1404,6 +1478,11 @@ function showPage(pageToShow) {
         renderAllKanjiCards();
         document.documentElement.style.setProperty('--pageColor', '#BCD8EC');
         searchForKanji.value = "";
+    }
+    
+     // ------ STORY PAGE
+    if (pageToShow == storyPage){
+        document.documentElement.style.setProperty('--pageColor', '#e7c3ad');
     }
 }
 

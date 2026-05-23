@@ -730,14 +730,14 @@ button {
 }
 
 .questionBlock h3{
-    font-size:  clamp(16px, 3vh, 24px);
+    font-size:  clamp(24px, 3vh, 30px);
 }
 
 .questionBlock button{
     width: 80%;
     text-align: start;
     margin-bottom: 10px;
-    font-size: clamp(16px, 2.5vh, 24px);
+    font-size: clamp(24px, 2.5vh, 30px);
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
     background-color: #e7c3ad;
     border-radius: 30px;

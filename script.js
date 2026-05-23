@@ -667,14 +667,14 @@ function addNewKanji() {
     }
 
     //duplicate kanji check
-    if (findExistingKanji(newKanji)) {
-        showPopup("This kanji already exists in the database.", "OK", null);
+    if (findExistingKanjiOnly(newKanji)) {
+        showPopup("This kanji already exists in the database.", "オケ", null);
         return;
     }
 
     //must have at least one part
     if (kanjiPartInputs.length === 0) {
-        showPopup("Please add at least one kanji part.", "OK", null);
+        showPopup("Please add at least one kanji part.", "オケ", null);
         return;
     }
 
@@ -684,7 +684,7 @@ function addNewKanji() {
         const kanjiChar = part.kanjiInput.value.trim();
 
         if (kanjiChar === "") {
-            showPopup("Kanji part cannot be empty.", "OK", null);
+            showPopup("Kanji part cannot be empty.", "オケ", null);
             return;
         }
 
@@ -1146,17 +1146,35 @@ function openEditForm(kanjiName) {
         const partBox = document.createElement("div");
         partBox.classList.add("strokePartBox");
 
+        const titleAndDeleteButton = document.createElement("div");
+        titleAndDeleteButton.classList.add("titleAndDeleteButton");
+
         const title = document.createElement("h3");
         title.textContent = part.kanji;
 
-        partBox.appendChild(title);
+        const deleteKanjiPartButton = document.createElement("button");
+        deleteKanjiPartButton.textContent = "X"
+        deleteKanjiPartButton.classList.add("deleteKanjiPartButton");
+
+        deleteKanjiPartButton.addEventListener("click", () => {
+            //remove from entry data
+            entry.parts.splice(partIndex, 1);
+            //save updates
+            saveKanjiEdits(entry.kanji, {parts: entry.parts});
+            //remove UI
+            partBox.remove();
+        });
+
+        titleAndDeleteButton.appendChild(title);
+        titleAndDeleteButton.appendChild(deleteKanjiPartButton);
+        partBox.appendChild(titleAndDeleteButton);
 
         const strokeList = document.createElement("div");
         strokeList.classList.add("strokeList");
 
         part.strokeDirections.forEach((dir, strokeIndex) => {
 
-            const row = document.createElement("div");
+            const selectAndDelete = document.createElement("div");
 
             const select = document.createElement("select");
 
@@ -1182,13 +1200,13 @@ function openEditForm(kanjiName) {
             deleteButton.classList.add("strokeEditDeleteButton");
 
             deleteButton.addEventListener("click", () => {
-                row.remove();
+                selectAndDelete.remove();
             });
 
-            row.appendChild(select);
-            row.appendChild(deleteButton);
+            selectAndDelete.appendChild(select);
+            selectAndDelete.appendChild(deleteButton);
 
-            strokeList.appendChild(row);
+            strokeList.appendChild(selectAndDelete);
         });
 
         // add stroke button
@@ -1202,11 +1220,11 @@ function openEditForm(kanjiName) {
 
             const select = document.createElement("select");
 
-            const deleteButton = document.createElement("button");
-            deleteButton.textContent = "X";
-            deleteButton.classList.add("strokeEditDeleteButton");
+            const strokeEditDeleteButton = document.createElement("button");
+            strokeEditDeleteButton.textContent = "X";
+            strokeEditDeleteButton.classList.add("strokeEditDeleteButton");
 
-            deleteButton.addEventListener("click", () => {
+            strokeEditDeleteButton.addEventListener("click", () => {
                 row.remove();
             });
 
@@ -1219,7 +1237,7 @@ function openEditForm(kanjiName) {
                 });
 
             row.appendChild(select);
-            row.appendChild(deleteButton);
+            row.appendChild(strokeEditDeleteButton);
             strokeList.appendChild(row);
         });
 
@@ -1273,6 +1291,7 @@ function openEditForm(kanjiName) {
     container.appendChild(saveButton);
     popup.appendChild(container);
 }
+
 
 // SAVE KANJI EDITS AND UPDATE IT IN THE DATABASE
 function saveKanjiEdits(oldKanji, updatedData) {
@@ -1553,6 +1572,10 @@ function findExistingKanji(char) {
     return kanjiDatabase.find(entry =>
         entry.parts.some(part => part.kanji === char)
     );
+}
+
+function findExistingKanjiOnly(char) {
+    return kanjiDatabase.some(entry => entry.kanji == char);
 }
 
 function getTotalStrokeCount(wordData) {

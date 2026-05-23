@@ -321,7 +321,7 @@ button {
 }
 
 
-.newFormButtons, #newKanjiForm select, .strokeList select, .strokeEditDeleteButton, .saveEditButton, .addStrokeButton{
+.newFormButtons, #newKanjiForm select, .strokeList select, .strokeEditDeleteButton, .saveEditButton, .addStrokeButton, .deleteKanjiPartButton{
     background-color: #F9E1AB;
     border-radius: 10px;
     margin-left: 10px;
@@ -329,12 +329,16 @@ button {
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
 
-.strokeEditDeleteButton, .saveEditButton, .addStrokeButton {
-    background-color: #FFCBE1;
+.strokeEditDeleteButton, .saveEditButton, .addStrokeButton, .deleteKanjiPartButton {
+    background-color: #F9E1AB;
+}
+
+.addStrokeButton{
+    margin-bottom: 40px;
 }
 
 .strokeList select{
-    background-color: #FFCBE1;
+    background-color: #F9E1AB;
     border-radius: 30px;
     border-width: 0px;
     margin-left: 10px;
@@ -348,10 +352,11 @@ button {
 
 .strokeList {
     display: grid;
-    grid-template-columns: repeat(3, minmax(160px, 1fr));
-    gap: 58px;
-    width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 50px;
+    width: 90%;
     margin-bottom: 30px;
+    justify-content: center;
 }
 
 .strokeList > div {
@@ -570,6 +575,25 @@ button {
     transform: translateY(-80px);    
 }
 
+.titleAndDeleteButton{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 7vh;
+    margin: 20px;
+}
+
+.titleAndDeleteButton h3{
+    font-size: 30px;
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
+}
+
+.titleAndDeleteButton button{
+    height: 5vh;
+    width: 5vh;
+    border-radius: 90px;
+}
 
 
 /* -------------------- POPUP -------------------- */ 

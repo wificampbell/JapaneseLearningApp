@@ -1470,11 +1470,12 @@ function renderStory(data) {
 }
 
 
-writtenStory.addEventListener("mouseup", () => {
-    const selection = window.getSelection().toString();
-    highlightTextButtonYellow.disabled = selection.length === 0;
-    highlightTextButtonBlue.disabled = selection.length === 0;
-    highlightTextButtonPurple.disabled = selection.length === 0;
+document.addEventListener("selectionchange", () => {
+    const selection = window.getSelection();
+    const text = selection ? selection.toString() : "";
+    highlightTextButtonYellow.disabled = text.length === 0;
+    highlightTextButtonBlue.disabled = text.length === 0;
+    highlightTextButtonPurple.disabled = text.length === 0;
 
 });
 

@@ -38,6 +38,7 @@ let currentKanji = null;
 let writingCorrectAnswers = 0;
 let writingTotalAnswers = 0;
 let showStrokesHelpImageButtonPressed = false;
+let toggleStrokeHelpImageState = false;
 
 // ーーーーーーーーーーーーーー ADD NEW KANJI PAGE
 const uploadNewKanjiPage = document.getElementById("uploadNewKanjiPage");
@@ -194,7 +195,7 @@ function createKanjiCanvases(wordData) {
         canvas.classList.add("kanjiCanvas");
 
 
-        if (showStrokesHelpImageButtonPressed) {
+        if (toggleStrokeHelpImageState) {
             box.classList.add("withStroke");
             box.style.backgroundImage = `url("KanjiStrokes/${part.kanji}.png")`;
             const overlay = document.createElement("div");
@@ -229,7 +230,7 @@ function initializeCanvas(canvas, ctx) {
     //apply correct scaling 
     ctx.scale(dpr, dpr);
 
-    if (showStrokesHelpImageButtonPressed) {
+    if (toggleStrokeHelpImageState) {
         ctx.lineWidth = 10;
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
@@ -421,7 +422,8 @@ hintButton.addEventListener("click", () => {
 });
 
 showStrokesHelpImageButton.addEventListener("click", () => {
-    showStrokesHelpImageButtonPressed = !showStrokesHelpImageButtonPressed;
+    showStrokesHelpImageButtonPressed = true;
+    toggleStrokeHelpImageState = !toggleStrokeHelpImageState;
     createKanjiCanvases(currentDisplayedKanji);
 });
 
@@ -451,6 +453,7 @@ function checkKanji() {
         }
         saveKanjiEdits(target.kanji, { correctness: updatedCorrectness });
         showStrokesHelpImageButtonPressed = false;
+        toggleStrokeHelpImageState = false;
         resetStrokeData();
         displayRandomKanji();
         return;
@@ -478,6 +481,7 @@ function checkKanji() {
             }
             saveKanjiEdits(target.kanji, { correctness: updatedCorrectness });
             showStrokesHelpImageButtonPressed = false;
+            toggleStrokeHelpImageState = false;
             resetStrokeData();
             return;
         }
@@ -520,6 +524,7 @@ function checkKanji() {
 
     saveKanjiEdits(target.kanji, { correctness: updatedCorrectness });
     showStrokesHelpImageButtonPressed = false;
+    toggleStrokeHelpImageState = false;
     resetStrokeData();
 }
 
@@ -1603,6 +1608,7 @@ function showPage(pageToShow) {
         hintText.classList.add("hidden");
         hintPressed = false;
         showStrokesHelpImageButtonPressed = false;
+        toggleStrokeHelpImageState = false;
         displayRandomKanji();
         resetStrokeData();
         document.documentElement.style.setProperty('--pageColor', '#D6E5BD');

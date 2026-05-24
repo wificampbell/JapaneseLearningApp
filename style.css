@@ -763,6 +763,10 @@ button {
     background-color: #DCCCEC;
 }
 
+#deleteHighlight{
+    background-color: #d1d0d0;
+}
+
 .questionBlock {
     margin-bottom: 10px;
     padding: 10px;

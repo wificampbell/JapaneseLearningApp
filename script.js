@@ -3,7 +3,6 @@
 
 // ーーーーーーーーーーーーーー NAV BUTTONS
 const topNavigation = document.getElementById("topNavigation");
-const homePageNavigationButton = document.getElementById("homePageNavigationButton");
 const writeKanjiPageNavigationButton = document.getElementById("writeKanjiPageNavigationButton");
 const addNewKanjiPageNavigationButton = document.getElementById("addNewKanjiPageNavigationButton");
 const flashcardPageNavigationButton = document.getElementById("flashcardPageNavigationButton");
@@ -91,9 +90,11 @@ const generateStoryWithPromptButton = document.getElementById("generateStoryWith
 const highlightTextButtonYellow = document.getElementById("highlightTextButtonYellow");
 const highlightTextButtonBlue = document.getElementById("highlightTextButtonBlue");
 const highlightTextButtonPurple = document.getElementById("highlightTextButtonPurple");
+const deleteHighlight = document.getElementById("deleteHighlight");
 const writtenStory = document.getElementById("writtenStory");
 let generatingWithPrompt = false;
 let generatingWithFile = false;
+let savedRange = null;
 
 
 
@@ -141,9 +142,6 @@ function loadKanjiDatabase() {
 
 
 // -------------------- NAVIGATIONS -------------------- //
-homePageNavigationButton.addEventListener("click", () => {
-    showPage(homePage)
-})
 
 writeKanjiPageNavigationButton.addEventListener("click", () => {
     showPage(kanjiWritingPage)
@@ -1380,6 +1378,10 @@ function generateStory(event) {
         const jsonString = prompt("Paste story JSON here:");
         const data = JSON.parse(jsonString);
         renderStory(data);
+        highlightTextButtonYellow.classList.remove("hidden");
+        highlightTextButtonBlue.classList.remove("hidden");
+        highlightTextButtonPurple.classList.remove("hidden");
+        deleteHighlight.classList.remove("hidden");
         return;
     }
     else {
@@ -1416,6 +1418,7 @@ function generateStory(event) {
     highlightTextButtonYellow.classList.remove("hidden");
     highlightTextButtonBlue.classList.remove("hidden");
     highlightTextButtonPurple.classList.remove("hidden");
+    deleteHighlight.classList.remove("hidden");
 }
 
 
@@ -1469,58 +1472,96 @@ function renderStory(data) {
     });
 }
 
-
 document.addEventListener("selectionchange", () => {
-    const selection = window.getSelection();
-    const text = selection ? selection.toString() : "";
-    highlightTextButtonYellow.disabled = text.length === 0;
-    highlightTextButtonBlue.disabled = text.length === 0;
-    highlightTextButtonPurple.disabled = text.length === 0;
 
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount && selection.toString().trim().length > 0) {
+        savedRange = selection.getRangeAt(0).cloneRange();
+        highlightTextButtonYellow.disabled = false;
+        highlightTextButtonBlue.disabled = false;
+        highlightTextButtonPurple.disabled = false;
+        deleteHighlight.disabled = false;
+    }
+    else {
+        highlightTextButtonYellow.disabled = true;
+        highlightTextButtonBlue.disabled = true;
+        highlightTextButtonPurple.disabled = true;
+        deleteHighlight.disabled = true;
+    }
 });
 
+
 highlightTextButtonYellow.addEventListener("click", () => {
-    highlightSelection("rgba(255, 191, 0, 0.6)")
+    highlightSelection("rgba(255, 191, 0, 0.6)");
 });
 
 highlightTextButtonBlue.addEventListener("click", () => {
-    highlightSelection("rgba(87, 221, 255, 0.6)")
+    highlightSelection("rgba(87, 221, 255, 0.6)");
 });
 
 highlightTextButtonPurple.addEventListener("click", () => {
-    highlightSelection("rgba(223, 172, 255, 0.6)")
+    highlightSelection("rgba(223, 172, 255, 0.6)");
 });
 
-
+deleteHighlight.addEventListener("click", () => {
+    deleteHighlightSelection();
+})
 
 function highlightSelection(backgroundColor) {
 
-    const selection = window.getSelection();
-
-    if (!selection.rangeCount) {
+    if (!savedRange) {
         showPopup("Please highlight at least one line.", "オケ", null);
         return;
     }
-    const range = selection.getRangeAt(0);
-    const span = document.createElement("span");
 
+    const span = document.createElement("span");
     span.classList.add("highlight");
     span.style.backgroundColor = backgroundColor;
 
-    span.addEventListener("click", () => {
-        if (span.classList.contains("highlight")) {
-            span.classList.remove("highlight");
-        }
-    })
-
     try {
-        range.surroundContents(span);
+        const extracted = savedRange.extractContents();
+        span.appendChild(extracted);
+        savedRange.insertNode(span);
     }
     catch {
-        showPopup("Can't highlight across existing highlights. Try selecting a single clean section.", "オケ", null);
+        showPopup("Could not highlight selection", "オケ", null);
         return;
     }
-    selection.removeAllRanges();
+    
+    window.getSelection().removeAllRanges();
+    savedRange = null; 
+}
+
+function deleteHighlightSelection() {
+
+    if (!savedRange) {
+        showPopup( "Please select highlighted text first.", "オケ", null);
+        return;
+    }
+
+    const container = savedRange.commonAncestorContainer;
+
+    const element = container.nodeType === 3 ? container.parentElement : container;
+
+    if (!element || !element.classList.contains("highlight") ) {
+        showPopup("Selected text is not highlighted.", "オケ", null);
+        return;
+    }
+
+    const parent = element.parentNode;
+
+    while (element.firstChild) {
+        parent.insertBefore(
+            element.firstChild,
+            element
+        );
+    }
+
+    parent.removeChild(element);
+
+    savedRange = null;
+
+    window.getSelection().removeAllRanges();
 }
 
 
@@ -1600,6 +1641,7 @@ function showPage(pageToShow) {
         highlightTextButtonYellow.classList.add("hidden");
         highlightTextButtonBlue.classList.add("hidden");
         highlightTextButtonPurple.classList.add("hidden");
+        deleteHighlight.classList.add("hidden");
         document.documentElement.style.setProperty('--pageColor', '#FFADAD');
     }
 }

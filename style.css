@@ -667,7 +667,6 @@ button {
     top: 20px;
     left: 90%;
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
-
 }
 
 
@@ -735,16 +734,33 @@ button {
     overflow-y: scroll;
 }
 
-#highlightTextButton{
+#highlighterColors{
+    display: flex;
+    flex-direction: row;
+}
+
+#highlighterColors button{
     width: auto;
     height: auto;
     border-radius: 30px;
     align-self: flex-start;
     margin-left: 30px;
+    margin-top: 10px;
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
     font-size: clamp(12px, 2.5vh, 30px);
-    background-color: #FFADAD;
     padding: 10px;
+}
+
+#highlightTextButtonYellow{
+    background-color: #F9E1AB;
+}
+
+#highlightTextButtonBlue{
+    background-color: #BCD8EC;
+}
+
+#highlightTextButtonPurple{
+    background-color: #DCCCEC;
 }
 
 .questionBlock {
@@ -778,6 +794,5 @@ button {
 }
 
 .highlight {
-    background-color: rgba(255, 191, 0, 0.6);
     border-radius: 4px;
 }

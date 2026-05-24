@@ -88,7 +88,9 @@ const searchForKanji = document.getElementById("searchForKanji");
 const storyPage = document.getElementById("storyPage");
 const generateStoryWithFileButton = document.getElementById("generateStoryWithFileButton");
 const generateStoryWithPromptButton = document.getElementById("generateStoryWithPromptButton");
-const highlightTextButton = document.getElementById("highlightTextButton");
+const highlightTextButtonYellow = document.getElementById("highlightTextButtonYellow");
+const highlightTextButtonBlue = document.getElementById("highlightTextButtonBlue");
+const highlightTextButtonPurple = document.getElementById("highlightTextButtonPurple");
 const writtenStory = document.getElementById("writtenStory");
 let generatingWithPrompt = false;
 let generatingWithFile = false;
@@ -1411,7 +1413,9 @@ function generateStory(event) {
 
     generatingWithPrompt = false;
     generatingWithFile = false;
-    highlightTextButton.classList.remove("hidden");
+    highlightTextButtonYellow.classList.remove("hidden");
+    highlightTextButtonBlue.classList.remove("hidden");
+    highlightTextButtonPurple.classList.remove("hidden");
 }
 
 
@@ -1468,12 +1472,27 @@ function renderStory(data) {
 
 writtenStory.addEventListener("mouseup", () => {
     const selection = window.getSelection().toString();
-    highlightTextButton.disabled = selection.length === 0;
+    highlightTextButtonYellow.disabled = selection.length === 0;
+    highlightTextButtonBlue.disabled = selection.length === 0;
+    highlightTextButtonPurple.disabled = selection.length === 0;
+
 });
 
-highlightTextButton.addEventListener("click", highlightSelection);
+highlightTextButtonYellow.addEventListener("click", () => {
+    highlightSelection("rgba(255, 191, 0, 0.6)")
+});
 
-function highlightSelection() {
+highlightTextButtonBlue.addEventListener("click", () => {
+    highlightSelection("rgba(87, 221, 255, 0.6)")
+});
+
+highlightTextButtonPurple.addEventListener("click", () => {
+    highlightSelection("rgba(223, 172, 255, 0.6)")
+});
+
+
+
+function highlightSelection(backgroundColor) {
 
     const selection = window.getSelection();
 
@@ -1483,15 +1502,35 @@ function highlightSelection() {
     }
     const range = selection.getRangeAt(0);
     const span = document.createElement("span");
-    console.log("range is: ", range);
 
     span.classList.add("highlight");
+    span.style.backgroundColor = backgroundColor;
 
-    range.surroundContents(span);
-    saveStoryHighlights();
+    span.addEventListener("click", () => {
+        if (span.classList.contains("highlight")) {
+            span.classList.remove("highlight");
+        }
+    })
 
+    try {
+        range.surroundContents(span);
+    }
+    catch {
+        showPopup("Can't highlight across existing highlights. Try selecting a single clean section.", "オケ", null);
+        return;
+    }
     selection.removeAllRanges();
 }
+
+
+
+
+
+
+
+
+
+
 
 
 // -------------------- HELPER FUNCTIONS -------------------- // 
@@ -1557,7 +1596,9 @@ function showPage(pageToShow) {
 
     // ------ STORY PAGE
     if (pageToShow == storyPage) {
-        highlightTextButton.classList.add("hidden");
+        highlightTextButtonYellow.classList.add("hidden");
+        highlightTextButtonBlue.classList.add("hidden");
+        highlightTextButtonPurple.classList.add("hidden");
         document.documentElement.style.setProperty('--pageColor', '#FFADAD');
     }
 }

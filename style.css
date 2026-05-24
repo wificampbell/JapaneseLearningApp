@@ -681,15 +681,30 @@ button {
     flex-direction: column;
 }
 
-#generateStoryButton{
-    width: 30%;
-    height: 6vh;
+#storyPageButtons{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+}
+
+#storyPageButtons h3{
+    height: 100%;
+    margin-top: 50px;
+    align-content: center;
+}
+
+#generateStoryWithFileButton, #generateStoryWithPromptButton{
+    width: auto;
+    height: auto;
     border-radius: 30px;
     align-self: center;
     margin-top: 30px;
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
     font-size: clamp(12px, 2.5vh, 30px);
-    background-color: #e7c3ad;
+    background-color: #FFADAD;
+    padding: 10px;
 }
 
 #multipleChoiceContainer{
@@ -706,8 +721,7 @@ button {
     flex-direction: row;
     width: 100%;
     height: 80%;
-    gap: 40px;
-    margin-top: 20px;
+    margin-top: 0px;
 }
 
 #writtenStory {
@@ -718,8 +732,20 @@ button {
     margin-left: 20px;
     align-self: center;
     font-size: 25px;
+    overflow-y: scroll;
 }
 
+#highlightTextButton{
+    width: auto;
+    height: auto;
+    border-radius: 30px;
+    align-self: flex-start;
+    margin-left: 30px;
+    font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
+    font-size: clamp(12px, 2.5vh, 30px);
+    background-color: #FFADAD;
+    padding: 10px;
+}
 
 .questionBlock {
     margin-bottom: 10px;
@@ -739,7 +765,7 @@ button {
     margin-bottom: 10px;
     font-size: clamp(24px, 2.5vh, 30px);
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
-    background-color: #e7c3ad;
+    background-color: #FFADAD;
     border-radius: 30px;
     padding-left: 20px; 
 }
@@ -749,4 +775,9 @@ button {
 /* -------------------- HELPER STYLES -------------------- */ 
 .hidden {
     display: none !important;
+}
+
+.highlight {
+    background-color: rgba(255, 191, 0, 0.6);
+    border-radius: 4px;
 }

@@ -86,7 +86,14 @@ const searchForKanji = document.getElementById("searchForKanji");
 
 // ーーーーーーーーーーーーーー STORY PAGE
 const storyPage = document.getElementById("storyPage");
-const generateStoryButton = document.getElementById("generateStoryButton");
+const generateStoryWithFileButton = document.getElementById("generateStoryWithFileButton");
+const generateStoryWithPromptButton = document.getElementById("generateStoryWithPromptButton");
+const highlightTextButton = document.getElementById("highlightTextButton");
+const writtenStory = document.getElementById("writtenStory");
+let generatingWithPrompt = false;
+let generatingWithFile = false;
+
+
 
 // ーーーーーーーーーーーーーー POPUP
 
@@ -1347,46 +1354,66 @@ function filterKanji(query) {
 }
 
 
-
-
-
 // -------------------- STORY PAGE -------------------- // 
-generateStoryButton.addEventListener("click", () => {
+generateStoryWithFileButton.addEventListener("click", () => {
+    generatingWithFile = true;
+    generatingWithPrompt = false;
     importedStoryFile.value = "";
     importedStoryFile.click();
-})
-
+});
 
 importedStoryFile.addEventListener("change", generateStory);
 
+
+generateStoryWithPromptButton.addEventListener("click", () => {
+    generatingWithPrompt = true;
+    generatingWithFile = false;
+    generateStory();
+});
+
+
 function generateStory(event) {
 
-    //get the file (first selected file)
-    const file = event.target.files?.[0];
-
-    if (!file) {
+    if (generatingWithPrompt) {
+        const jsonString = prompt("Paste story JSON here:");
+        const data = JSON.parse(jsonString);
+        renderStory(data);
         return;
     }
-    //browser tool for reading files
-    const reader = new FileReader();
-    //once file has been fully read
-    reader.onload = function (e) {
-        try {
-            const importedStoryData = JSON.parse(e.target.result);
-            //makes sure file is correct format
-            if (!importedStoryData.story ||!Array.isArray(importedStoryData.questions)) {
-                throw new Error("Invalid format");
+    else {
+
+        //get the file (first selected file)
+        const file = event.target.files?.[0];
+
+        if (!file) {
+            return;
+        }
+        //browser tool for reading files
+        const reader = new FileReader();
+        //once file has been fully read
+        reader.onload = function (e) {
+            try {
+                const importedStoryData = JSON.parse(e.target.result);
+                //makes sure file is correct format
+                if (!importedStoryData.story || !Array.isArray(importedStoryData.questions)) {
+                    throw new Error("Invalid format");
+                }
+                renderStory(importedStoryData);
             }
-            renderStory(importedStoryData);
+            catch {
+                throw new Error("Error, please try again.");
+            }
         }
-        catch {
-            throw new Error("Error, please try again.");
-        }
+
+        reader.readAsText(file);
+        importedStoryFile.value = "";
     }
 
-    reader.readAsText(file);
-    importStoryFile.value = "";
+    generatingWithPrompt = false;
+    generatingWithFile = false;
+    highlightTextButton.classList.remove("hidden");
 }
+
 
 function renderStory(data) {
 
@@ -1439,9 +1466,32 @@ function renderStory(data) {
 }
 
 
+writtenStory.addEventListener("mouseup", () => {
+    const selection = window.getSelection().toString();
+    highlightTextButton.disabled = selection.length === 0;
+});
 
+highlightTextButton.addEventListener("click", highlightSelection);
 
+function highlightSelection() {
 
+    const selection = window.getSelection();
+
+    if (!selection.rangeCount) {
+        showPopup("Please highlight at least one line.", "オケ", null);
+        return;
+    }
+    const range = selection.getRangeAt(0);
+    const span = document.createElement("span");
+    console.log("range is: ", range);
+
+    span.classList.add("highlight");
+
+    range.surroundContents(span);
+    saveStoryHighlights();
+
+    selection.removeAllRanges();
+}
 
 
 // -------------------- HELPER FUNCTIONS -------------------- // 
@@ -1507,7 +1557,8 @@ function showPage(pageToShow) {
 
     // ------ STORY PAGE
     if (pageToShow == storyPage) {
-        document.documentElement.style.setProperty('--pageColor', '#e7c3ad');
+        highlightTextButton.classList.add("hidden");
+        document.documentElement.style.setProperty('--pageColor', '#FFADAD');
     }
 }
 

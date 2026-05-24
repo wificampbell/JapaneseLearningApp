@@ -115,8 +115,13 @@
 
     <!-------------------- STORY PAGE -------------------->
     <section id="storyPage">
-        <button id="generateStoryButton">Generate Story</button>
+        <div id="storyPageButtons">
+            <button id="generateStoryWithFileButton">File Upload</button>
+            <h3>Or</h1>
+            <button id="generateStoryWithPromptButton">Prompt Input</button>
+        </div>
         <input type=file id="importedStoryFile" accept=".json" hidden>
+        <button id="highlightTextButton">✐ᝰ</button>
         <div id="storyAndMultipleChoice">
             <div id="writtenStory"></div>
             <div id="multipleChoiceContainer"></div>

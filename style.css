@@ -179,6 +179,7 @@ button {
     margin-left: 50px;
     margin-right: 40px;
     margin-top: 50px;
+    margin-bottom: -10vh;
 }
 
 #canvasButtons {
@@ -256,20 +257,21 @@ button {
 }
 
 #displayDirections {
-    position: absolute;
-    top: 200px;
-    left: 20px;
-
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    flex-wrap: wrap;
     z-index: 1000;
-
     background-color: #d6e5bd8a;
     padding: 20px;
     border-radius: 15px;
-    max-width: 300px;
+    max-width: 80%;
+    align-self: center;
+    margin-top: auto;
+    margin-bottom: auto;
 
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
 }
-
 
 /* -------------------- ADD NEW KANJI -------------------- */ 
 

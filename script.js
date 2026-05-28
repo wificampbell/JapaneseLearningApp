@@ -119,8 +119,10 @@ let kanjiDatabase = [];
 window.addEventListener("DOMContentLoaded", init);
 
 function init() {
+    //load the kanji database upon entering 
     kanjiDatabase = loadKanjiDatabase();
 
+    //go to the last page that was accessed
     const pageMap = {
         homePage,
         kanjiWritingPage,
@@ -128,11 +130,8 @@ function init() {
         flashcardPage,
         displayAllKanjiPage
     };
-
     let startPageId = localStorage.getItem("currentPage");
-
     let startPage = pageMap[startPageId] || homePage;
-
     showPage(startPage);
 }
 
@@ -147,7 +146,6 @@ function loadKanjiDatabase() {
 writeKanjiPageNavigationButton.addEventListener("click", () => {
     showPage(kanjiWritingPage)
 })
-
 
 addNewKanjiPageNavigationButton.addEventListener("click", () => {
     showPage(uploadNewKanjiPage)
@@ -173,6 +171,7 @@ function createKanjiCanvases(wordData) {
 
     kanjiCanvasContainer.innerHTML = "";
     displayDirections.innerHTML = ""
+    displayDirections.classList.add("hidden");
 
     // save currently displayed word
     currentDisplayedKanji = wordData;
@@ -350,8 +349,6 @@ function resetStrokeData() {
         currentDisplayedKanji.userStrokes[index] = [];
     });
 
-    displayDirections.innerHTML = ""
-    displayDirections.classList.add("hidden");
 }
 
 
@@ -399,12 +396,11 @@ function getStrokeDirection(stroke) {
 clearCanvas.addEventListener("click", () => {
 
     document.querySelectorAll(".kanjiCanvas").forEach(canvas => {
-
         const ctx = canvas.getContext("2d");
-
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     });
-
+    displayDirections.innerHTML = "";
+    displayDirections.classList.add("hidden");
     resetStrokeData();
 });
 
@@ -441,6 +437,7 @@ function checkKanji() {
     let total = 0;
     let updatedCorrectness;
 
+    //if user clicked to see the strokes, they do not get any extra correctness 
     if (showStrokesHelpImageButtonPressed) {
         if (!("correctness" in target)) {
             updatedCorrectness = 0;
@@ -451,25 +448,30 @@ function checkKanji() {
                 updatedCorrectness = 0
             }
         }
+        //saving the correctness value
         saveKanjiEdits(target.kanji, { correctness: updatedCorrectness });
+
         showStrokesHelpImageButtonPressed = false;
         toggleStrokeHelpImageState = false;
+        //displayDirections.innerHTML = ""
         resetStrokeData();
         displayRandomKanji();
         return;
     }
 
+    //going through each kanji part of the currently displayed kanji 
     for (let i = 0; i < target.parts.length; i++) {
         const expected = target.parts[i].strokeDirections;
-        const user = target.userStrokes[i];
+        const userStrokes = target.userStrokes[i];
 
-        //
-        if (!user) {
+        //if no user strokes, ignore/move on
+        if (!userStrokes) {
             continue;
         }
 
-        if (user.length !== expected.length) {
-            showPopup("Answer: " + target.kanji + "\nStrokes Given: " + user.length + "\nExpected Amount: " + expected.length, "オケ", "displayRandomKanji");
+        //determining the correctness value if incorrect amount of strokes
+        if (userStrokes.length !== expected.length) {
+            showPopup("Answer: " + target.kanji + "\nStrokes Given: " + userStrokes.length + "\nExpected Amount: " + expected.length, "オケ", "displayRandomKanji");
             if (!("correctness" in target)) {
                 updatedCorrectness = 0;
             }
@@ -482,19 +484,22 @@ function checkKanji() {
             saveKanjiEdits(target.kanji, { correctness: updatedCorrectness });
             showStrokesHelpImageButtonPressed = false;
             toggleStrokeHelpImageState = false;
+            displayDirections.innerHTML = "";
+            displayCorrectKanjiStrokes(target);
             resetStrokeData();
             return;
         }
 
         //counting correct # of stroke directions
         for (let j = 0; j < expected.length; j++) {
-            if (user[j] === expected[j]) {
+            if (userStrokes[j] === expected[j]) {
                 correct++;
             }
             total++;
         }
     }
 
+    //calculating the updated kanji correctness score 
     let score = 0;
     if (total === 0) {
         score = 0;
@@ -509,7 +514,7 @@ function checkKanji() {
             updatedCorrectness = score;
         }
         else {
-            updatedCorrectness = (target.correctness + score) / 2 - (hintPressed ? 5 : 0);
+            updatedCorrectness = Math.round((target.correctness + score) / 2) - (hintPressed ? 5 : 0);
         }
     }
     else {
@@ -518,20 +523,71 @@ function checkKanji() {
             updatedCorrectness = 100;
         }
         else {
-            updatedCorrectness = (target.correctness + score) / 2 - (hintPressed ? 5 : 0);
+            updatedCorrectness = Math.round((target.correctness + score) / 2) - (hintPressed ? 5 : 0);
         }
     }
 
+    //save the score to database 
     saveKanjiEdits(target.kanji, { correctness: updatedCorrectness });
+
+    //resets
     showStrokesHelpImageButtonPressed = false;
     toggleStrokeHelpImageState = false;
+
+    displayCorrectKanjiStrokes(target);
     resetStrokeData();
 }
 
+function displayCorrectKanjiStrokes(target) {
+    displayDirections.innerHTML = "";
+    for (const part of target.parts) {
+
+        const title = document.createElement("div");
+        title.textContent = part.kanji + ":";
+        displayDirections.appendChild(title);
+
+        for (const dir of part.strokeDirections) {
+            const d = document.createElement("div");
+            d.textContent = dir;
+            displayDirections.appendChild(d);
+        }
+    }
+}
+
+// WEIGH THE KANJIS TO MAKE SURE THAT LOWER CORECTNESS KANJIS GET SHOWN MORE
+function getWeightedRandomKanji(database) {
+
+    let totalWeight = 0;
+
+    // loops through ever kanji in the database and creates a new array of the kanji and its weight
+    const weighted = database.map(kanji => {
+        // makes sure correctness is never negative and stays between 0 and 100 (if number is undefined, then the correctness becomes 0)
+        const correctness = Math.max(0, Math.min(100, Number(kanji.correctness) || 0));
+        // the higher the correctness, the lower the weight (squared to allow for a big difference in weights)
+        const weight = Math.pow(101 - correctness, 2);
+        totalWeight += weight;
+        return {
+            kanji,
+            weight
+        };
+    });
+
+    // the random number that acts as the position inside the weighted probability space
+    let random = Math.random() * totalWeight;
+    for (const item of weighted) {
+        // moves through the probability space 
+        // big weights subtract more, and so they are more likely to hit 0 first and be returned first
+        random -= item.weight;
+        if (random <= 0) {
+            return item.kanji;
+        }
+    }
+}
 
 // DISPLAY RANDOM KANJI FOR THE WRITING PAGE
 function displayRandomKanji() {
 
+    //if database has no kanji
     if (kanjiDatabase.length === 0) {
         randomKanjiDisplay.textContent = "No Kanji Yet";
         return;
@@ -539,25 +595,22 @@ function displayRandomKanji() {
 
     let randomKanji;
 
+    //keep doing it if the random generated kanji is the same as the current kanji
     do {
-        randomKanji = getRandomKanji();
-    } while (
-        kanjiDatabase.length > 1 &&
-        currentKanji &&
-        randomKanji.kanji === currentKanji.kanji
-    );
+        randomKanji = getWeightedRandomKanji(kanjiDatabase);
+    }
+    while (kanjiDatabase.length > 1 && currentKanji && randomKanji.kanji === currentKanji.kanji);
 
+    //keeping track of previous and current kanjis
     previousKanji = currentKanji;
     currentKanji = randomKanji;
     currentDisplayedKanji = randomKanji;
 
+    //clearing
     hintText.innerHTML = "";
-
-    currentDisplayedKanji.userStrokes =
-        currentDisplayedKanji.parts.map(() => []);
+    currentDisplayedKanji.userStrokes = currentDisplayedKanji.parts.map(() => []);
 
     randomKanjiDisplay.textContent = randomKanji.meaning;
-
     createKanjiCanvases(currentDisplayedKanji);
 }
 
@@ -615,9 +668,7 @@ addKanjiPartButton.addEventListener("click", () => {
 
         //determine if this kanji already exists in the database 
         const existing = getStrokeDirectionsForKanji(kanjiInput.value);
-
         if (existing) {
-
             const strokesExistText = document.createElement("div");
             strokesExistText.textContent = "The strokes for this kanji are already in the system!";
             strokeContainer.appendChild(strokesExistText);
@@ -626,6 +677,7 @@ addKanjiPartButton.addEventListener("click", () => {
 
         const select = document.createElement("select");
 
+        //generating the direction select options 
         directions.forEach(dir => {
             const option = document.createElement("option");
             option.value = dir;
@@ -806,6 +858,9 @@ storyPageButton.addEventListener("click", () => {
 
 
 
+
+
+
 // -------------------- FLASHCARDS -------------------- // 
 
 
@@ -815,7 +870,9 @@ function getRandomFlashcard() {
         return null;
     }
 
+    //get a random kanji
     const kanji = kanjiDatabase[Math.floor(Math.random() * kanjiDatabase.length)]
+    //get a random mode
     const modes = [
         "meaning-kanji",
         "meaning-hiragana",
@@ -824,7 +881,6 @@ function getRandomFlashcard() {
         "hiragana-meaning",
         "hiragana-kanji"
     ]
-
     const mode = modes[Math.floor(Math.random() * modes.length)]
 
     return { kanji, mode }
@@ -834,24 +890,29 @@ function getRandomFlashcard() {
 function makeFlashcards() {
     let flashcard = getRandomFlashcard();
 
+    //making sure the current and new flashcards aren't the same
     do {
         flashcard = getRandomFlashcard();
-    } while (
-        kanjiDatabase.length > 4 &&
-        currentFlashcard &&
-        flashcard.kanji === currentFlashcard.kanji
+    }
+    while (
+        kanjiDatabase.length > 4 && currentFlashcard && flashcard.kanji === currentFlashcard.kanji
     );
 
-    previousFlashCard = currentFlashcard;
-    currentFlashcard = flashcard;
 
     if (!flashcard) {
         return
     }
 
+    //updating/keeping track of current and previous flashcard 
+    previousFlashCard = currentFlashcard;
+    //??ONE OF THESE GOTTA GO
+    currentFlashcard = flashcard;
+
     currentFlashcard = flashcard.kanji
     flashCardMode = flashcard.mode
 
+
+    //calculating the correct answer and question based on mode
     let question = "";
     let correctAnswer = "";
 
@@ -885,6 +946,7 @@ function makeFlashcards() {
         correctAnswer = flashcard.kanji.kanji;
     }
 
+    //building the correct and incorrect choices
     const choices = buildChoices(correctAnswer, flashCardMode);
     renderFlashcard(question, correctAnswer, choices);
 }
@@ -1002,9 +1064,11 @@ function renderKanjiCard(eachKanji) {
 
     totalKanji.textContent = "Total Kanji: " + kanjiDatabase.length;
 
+    //changing kanji card background color based on overall correctness percentage
     const score = eachKanji.correctness ?? null;
     let kanjiCardColor = "#a4a4a4";
 
+    //hasn't been studied yet
     if (score === null) {
         kanjiCardColor = "#a4a4a4";
         correctnessPercentage.textContent = "";
@@ -1043,10 +1107,9 @@ function renderKanjiCard(eachKanji) {
 
 
 // EXPORT DATABASE
-
 exportDatabaseButton.addEventListener("click", () => {
     exportKanjiDatabase();
-})
+});
 
 function exportKanjiDatabase() {
     //turn JS array into text
@@ -1066,12 +1129,14 @@ function exportKanjiDatabase() {
     URL.revokeObjectURL(url);
 }
 
-// IMPORT DATABASE
 
+
+// IMPORT DATABASE
 importDatabaseButton.addEventListener("click", () => {
     importKanjiFile.value = "";
     importKanjiFile.click();
 });
+
 
 //runs importKanjiDatabase function when the user selects a file from file explorer
 importKanjiFile.addEventListener("change", importKanjiDatabase);
@@ -1093,33 +1158,31 @@ function importKanjiDatabase(event) {
             if (!Array.isArray(importedData)) {
                 throw new Error("Invalid format");
             }
+
             //replace database with file database 
             kanjiDatabase = importedData;
             localStorage.setItem(
                 "kanjiDatabase",
                 JSON.stringify(importedData)
             )
-
+            //confirmation
             showPopup("Kanji Database Imported Successfully!", "次", null);
-
+            //resets 
             currentKanji = null;
             previousKanji = null;
             currentDisplayedKanji = null;
-
             renderAllKanjiCards();
         }
 
         catch {
             showPopup("Error. Please Retry.", "オケ", null);
         };
-
         importKanjiFile.value = "";
-
     }
     //begins file processing
     reader.readAsText(file);
-
 }
+
 
 // EDIT A KANJI CARD 
 function openEditForm(kanjiName) {
@@ -1143,7 +1206,6 @@ function openEditForm(kanjiName) {
     editContainerInputs.classList.add("editContainerInputs");
 
 
-    // ---------- BASIC INFO ----------
     const kanjiInput = document.createElement("input");
     kanjiInput.value = entry.kanji;
 
@@ -1160,7 +1222,8 @@ function openEditForm(kanjiName) {
     container.appendChild(closeButton);
     container.appendChild(editContainerInputs);
 
-    // ---------- STROKE EDITOR ----------
+
+    //editing kanji strokes 
     const strokeEditor = document.createElement("div");
     strokeEditor.classList.add("strokeEditor");
 
@@ -1253,13 +1316,12 @@ function openEditForm(kanjiName) {
                 row.remove();
             });
 
-            ["top-bottom", "bottom-top", "left-right", "right-left", "diagonal-down", "diagonal-up"]
-                .forEach(d => {
-                    const option = document.createElement("option");
-                    option.value = d;
-                    option.textContent = d;
-                    select.appendChild(option);
-                });
+            ["top-bottom", "bottom-top", "left-right", "right-left", "diagonal-down", "diagonal-up"].forEach(d => {
+                const option = document.createElement("option");
+                option.value = d;
+                option.textContent = d;
+                select.appendChild(option);
+            });
 
             row.appendChild(select);
             row.appendChild(strokeEditDeleteButton);
@@ -1274,7 +1336,7 @@ function openEditForm(kanjiName) {
 
     container.appendChild(strokeEditor);
 
-    // ---------- SAVE ----------
+    //save changes 
     const saveButton = document.createElement("button");
     saveButton.textContent = "Save";
     saveButton.classList.add("saveEditButton");
@@ -1292,8 +1354,7 @@ function openEditForm(kanjiName) {
 
             const kanji = box.querySelector("h3").textContent;
 
-            const strokes = Array.from(box.querySelectorAll("select"))
-                .map(sel => sel.value);
+            const strokes = Array.from(box.querySelectorAll("select")).map(sel => sel.value);
 
             newParts.push({
                 kanji,
@@ -1321,15 +1382,19 @@ function openEditForm(kanjiName) {
 // SAVE KANJI EDITS AND UPDATE IT IN THE DATABASE
 function saveKanjiEdits(oldKanji, updatedData) {
 
+    //find kanji index 
     const index = kanjiDatabase.findIndex(k => k.kanji === oldKanji);
 
-    if (index === -1) return;
+    if (index === -1) {
+        return;
+    }
 
+    //update that kanji with the updated data
     kanjiDatabase[index] = {
         ...kanjiDatabase[index],
         ...updatedData
     };
-
+    //save that to local storahe
     localStorage.setItem("kanjiDatabase", JSON.stringify(kanjiDatabase));
 }
 
@@ -1340,11 +1405,12 @@ searchForKanji.addEventListener("input", () => {
 })
 
 
-// HANDLES FILTERING LOGIC
+// HANDLES FILTERING/SEARCHING LOGIC
 function filterKanji(query) {
     const container = document.getElementById("allKanjiContainer");
     container.innerHTML = "";
 
+    //show restults that match kanji, hiragana, or meaning
     const filtered = [...kanjiDatabase].reverse().filter(entry => {
         return (
             entry.kanji.includes(query) ||
@@ -1383,6 +1449,7 @@ function generateStory(event) {
         const jsonString = prompt("Paste story JSON here:");
         const data = JSON.parse(jsonString);
         renderStory(data);
+
         highlightTextButtonYellow.classList.remove("hidden");
         highlightTextButtonBlue.classList.remove("hidden");
         highlightTextButtonPurple.classList.remove("hidden");
@@ -1420,6 +1487,7 @@ function generateStory(event) {
 
     generatingWithPrompt = false;
     generatingWithFile = false;
+
     highlightTextButtonYellow.classList.remove("hidden");
     highlightTextButtonBlue.classList.remove("hidden");
     highlightTextButtonPurple.classList.remove("hidden");
@@ -1477,10 +1545,14 @@ function renderStory(data) {
     });
 }
 
+// handles detecting when the user has highlighted a piece of text 
 document.addEventListener("selectionchange", () => {
-
+    //get what the user highlighted 
     const selection = window.getSelection();
+    //make sure selection exists and it actually has a start to end, and make sure its not empty with spaces removed
     if (selection && selection.rangeCount && selection.toString().trim().length > 0) {
+        //saves the highlight position so that it can be used later even if the selection disappears 
+        // (mainly to work with mobile where selection will go away to hit the highlight button)
         savedRange = selection.getRangeAt(0).cloneRange();
         highlightTextButtonYellow.disabled = false;
         highlightTextButtonBlue.disabled = false;
@@ -1495,7 +1567,7 @@ document.addEventListener("selectionchange", () => {
     }
 });
 
-
+// Gets the background color for the highlight based on the button
 highlightTextButtonYellow.addEventListener("click", () => {
     highlightSelection("rgba(255, 191, 0, 0.6)");
 });
@@ -1512,8 +1584,11 @@ deleteHighlight.addEventListener("click", () => {
     deleteHighlightSelection();
 })
 
+
+// HIGHLIGHTS A SELECTION
 function highlightSelection(backgroundColor) {
 
+    //if no saved range 
     if (!savedRange) {
         showPopup("Please highlight at least one line.", "オケ", null);
         return;
@@ -1524,37 +1599,45 @@ function highlightSelection(backgroundColor) {
     span.style.backgroundColor = backgroundColor;
 
     try {
+        //removes the selected range from the DOM and stores it into extracted 
         const extracted = savedRange.extractContents();
+        //puts it into the span which has a highlight class
         span.appendChild(extracted);
+        //put it back into the DOM/the line so that it's the word/words in the line that have the highlight class
         savedRange.insertNode(span);
     }
     catch {
         showPopup("Could not highlight selection", "オケ", null);
         return;
     }
-    
+
+    //reset 
     window.getSelection().removeAllRanges();
-    savedRange = null; 
+    savedRange = null;
 }
 
+
+// DELETES A HIGHLIGHT SELECTION
 function deleteHighlightSelection() {
 
     if (!savedRange) {
-        showPopup( "Please select highlighted text first.", "オケ", null);
+        showPopup("Please select highlighted text first.", "オケ", null);
         return;
     }
 
+    //finds the lowest common parent node of the selection 
     const container = savedRange.commonAncestorContainer;
-
+    //if the container is a text node, then move up to the parent element
+    // otherwise use the container directly
     const element = container.nodeType === 3 ? container.parentElement : container;
-
-    if (!element || !element.classList.contains("highlight") ) {
+    //check if this contains a highlight
+    if (!element || !element.classList.contains("highlight")) {
         showPopup("Selected text is not highlighted.", "オケ", null);
         return;
     }
-
+    //get the parent of the highlight span
     const parent = element.parentNode;
-
+    //take everyrthing inside of span and move it out before the span (aka removing it out of the highlight)
     while (element.firstChild) {
         parent.insertBefore(
             element.firstChild,
@@ -1562,10 +1645,12 @@ function deleteHighlightSelection() {
         );
     }
 
+    //remove the highlight spam element
     parent.removeChild(element);
 
+    //resets
     savedRange = null;
-
+    //removes the blue selection highlight from the screen 
     window.getSelection().removeAllRanges();
 }
 
@@ -1609,6 +1694,8 @@ function showPage(pageToShow) {
         hintPressed = false;
         showStrokesHelpImageButtonPressed = false;
         toggleStrokeHelpImageState = false;
+        displayDirections.innerHTML = "";
+        displayDirections.classList.remove("hidden");
         displayRandomKanji();
         resetStrokeData();
         document.documentElement.style.setProperty('--pageColor', '#D6E5BD');
@@ -1739,6 +1826,14 @@ function closePopup() {
 function updateCounter(counterElement, totalQuestions, totalCorrect) {
     counterElement.textContent = totalCorrect + "/" + totalQuestions;
 }
+
+
+
+
+
+
+
+
 
 
 

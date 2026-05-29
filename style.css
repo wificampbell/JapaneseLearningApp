@@ -261,7 +261,6 @@ button {
     flex-direction: row;
     gap: 10px;
     flex-wrap: wrap;
-    z-index: 1000;
     background-color: #d6e5bd8a;
     padding: 20px;
     border-radius: 15px;
@@ -269,8 +268,9 @@ button {
     align-self: center;
     margin-top: auto;
     margin-bottom: auto;
-
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
+    max-height: 50px;
+    overflow-y: scroll;
 }
 
 /* -------------------- ADD NEW KANJI -------------------- */ 

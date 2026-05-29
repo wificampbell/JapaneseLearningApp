@@ -258,9 +258,9 @@ button {
 
 #displayDirections {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     background-color: #d6e5bd8a;
     padding: 20px;
     border-radius: 15px;
@@ -271,6 +271,10 @@ button {
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
     max-height: 50px;
     overflow-y: scroll;
+}
+
+#displayDirections div {
+    width: auto;
 }
 
 /* -------------------- ADD NEW KANJI -------------------- */ 

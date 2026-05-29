@@ -12,7 +12,7 @@ const storyPageNavigationButton = document.getElementById("storyPageNavigationBu
 // ーーーーーーーーーーーーーー KANJI WRITING PAGE
 
 const kanjiWritingPage = document.getElementById("kanjiWritingPage");
-const randomKanjiDisplay = document.getElementById("randomKanjiDisplay");
+let randomKanjiDisplay = document.getElementById("randomKanjiDisplay");
 const kanjiCanvasContainer = document.getElementById("kanjiCanvasContainer")
 const clearCanvas = document.getElementById("clearCanvas");
 const canvasButtons = document.getElementById("canvasButtons");
@@ -539,18 +539,32 @@ function checkKanji() {
 }
 
 function displayCorrectKanjiStrokes(target) {
+
     displayDirections.innerHTML = "";
+    randomKanjiDisplay.textContent = currentDisplayedKanji.kanji;
+
     for (const part of target.parts) {
 
         const title = document.createElement("div");
         title.textContent = part.kanji + ":";
+        title.style.fontSize = "20px";
         displayDirections.appendChild(title);
 
+        const directionRow = document.createElement("div");
+        directionRow.style.display = "flex";
+        directionRow.style.flexDirection = "row";
+        directionRow.style.gap = "10px"; 
+        directionRow.style.flexWrap = "wrap";
+
         for (const dir of part.strokeDirections) {
+
             const d = document.createElement("div");
             d.textContent = dir;
-            displayDirections.appendChild(d);
+            d.style.whiteSpace = "nowrap"
+            directionRow.appendChild(d);
         }
+
+        displayDirections.appendChild(directionRow);
     }
 }
 

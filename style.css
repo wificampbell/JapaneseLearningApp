@@ -283,6 +283,14 @@ button {
     width: auto;
 }
 
+.radioCheckBox{
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 0px;
+}
+
 /* -------------------- ADD NEW KANJI -------------------- */ 
 
 #uploadNewKanjiPage{

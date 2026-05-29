@@ -40,6 +40,8 @@ let writingTotalAnswers = 0;
 let showStrokesHelpImageButtonPressed = false;
 let toggleStrokeHelpImageState = false;
 
+let override = "";
+
 // ーーーーーーーーーーーーーー ADD NEW KANJI PAGE
 const uploadNewKanjiPage = document.getElementById("uploadNewKanjiPage");
 const addStrokeButton = document.getElementById("addStrokeButton");
@@ -345,6 +347,7 @@ function resetStrokeData() {
     hintPressed = false;
     currentDisplayedKanji.userStrokes = [];
     displayDirections.classList.remove("answer");
+    override = "";
 
     currentDisplayedKanji.parts.forEach((part, index) => {
         currentDisplayedKanji.userStrokes[index] = [];
@@ -428,7 +431,9 @@ showStrokesHelpImageButton.addEventListener("click", () => {
 // Handles checking whether the kanji the user written is correct
 function checkKanji() {
 
+    //the correct kanji
     const target = currentDisplayedKanji;
+    console.log("First correctness = " + target.correctness);
 
     if (!target) {
         return;
@@ -436,62 +441,52 @@ function checkKanji() {
 
     let correct = 0;
     let total = 0;
-    let updatedCorrectness;
+    let hintPenalty = hintPressed ? 5 : 0;
+    let updatedCorrectness = target.correctness ?? 0;
 
-    //if user clicked to see the strokes, they do not get any extra correctness 
+
+    //checking if the stroke image button was pressed
     if (showStrokesHelpImageButtonPressed) {
-        if (!("correctness" in target)) {
-            updatedCorrectness = 0;
-        }
-        else {
-            updatedCorrectness = target.correctness - 50;
-            if (updatedCorrectness < 0) {
-                updatedCorrectness = 0
-            }
-        }
-        //saving the correctness value
-        saveKanjiEdits(target.kanji, { correctness: updatedCorrectness });
 
+        updatedCorrectness = Math.max(0, updatedCorrectness - 50);
+        saveKanjiEdits(target.kanji, { correctness: updatedCorrectness });
         showStrokesHelpImageButtonPressed = false;
         toggleStrokeHelpImageState = false;
-        //displayDirections.innerHTML = ""
+
         resetStrokeData();
         displayRandomKanji();
         return;
     }
 
-    //going through each kanji part of the currently displayed kanji 
+
     for (let i = 0; i < target.parts.length; i++) {
+
         const expected = target.parts[i].strokeDirections;
         const userStrokes = target.userStrokes[i];
 
-        //if no user strokes, ignore/move on
+        //if no user strokes, skip this loop iteration and go to the next one
         if (!userStrokes) {
             continue;
         }
 
-        //determining the correctness value if incorrect amount of strokes
         if (userStrokes.length !== expected.length) {
+
             showPopup("Answer: " + target.kanji + "\nStrokes Given: " + userStrokes.length + "\nExpected Amount: " + expected.length, "オケ", "displayRandomKanji");
-            if (!("correctness" in target)) {
-                updatedCorrectness = 0;
-            }
-            else {
-                updatedCorrectness = target.correctness - 15 - (hintPressed ? 5 : 0);
-                if (updatedCorrectness < 0) {
-                    updatedCorrectness = 0
-                }
-            }
+
+            updatedCorrectness = Math.max(0, updatedCorrectness - 15 - hintPenalty);
+
             saveKanjiEdits(target.kanji, { correctness: updatedCorrectness });
+
             showStrokesHelpImageButtonPressed = false;
             toggleStrokeHelpImageState = false;
+
             displayDirections.innerHTML = "";
             displayCorrectKanjiStrokes(target);
+
             resetStrokeData();
             return;
         }
 
-        //counting correct # of stroke directions
         for (let j = 0; j < expected.length; j++) {
             if (userStrokes[j] === expected[j]) {
                 correct++;
@@ -500,44 +495,31 @@ function checkKanji() {
         }
     }
 
-    //calculating the updated kanji correctness score 
-    let score = 0;
-    if (total === 0) {
-        score = 0;
-    }
-    else {
-        score = Math.round((correct / total) * 100);
-    }
+
+    let score = total === 0 ? 0 : Math.round((correct / total) * 100);
 
     if (score <= 70) {
         showPopup("Answer: " + target.kanji + "\nスコア: " + score + "%", "次", "displayRandomKanji");
-        if (!("correctness" in target)) {
-            updatedCorrectness = score;
-        }
-        else {
-            updatedCorrectness = Math.round((target.correctness + score) / 2) - (hintPressed ? 5 : 0);
-        }
+        updatedCorrectness = Math.round((updatedCorrectness + score) / 2);
     }
     else {
         showPopup("スコア: " + score + "%", "次", "displayRandomKanji");
-        if (!("correctness" in target)) {
-            updatedCorrectness = 100;
-        }
-        else {
-            updatedCorrectness = Math.round((target.correctness + score) / 2) - (hintPressed ? 5 : 0);
-        }
+        updatedCorrectness = Math.round((updatedCorrectness + score) / 2);
     }
 
-    //save the score to database 
+    //save changes
     saveKanjiEdits(target.kanji, { correctness: updatedCorrectness });
 
-    //resets
+    //resets 
     showStrokesHelpImageButtonPressed = false;
     toggleStrokeHelpImageState = false;
 
     displayCorrectKanjiStrokes(target);
     resetStrokeData();
 }
+
+
+
 
 function displayCorrectKanjiStrokes(target) {
 
@@ -555,7 +537,7 @@ function displayCorrectKanjiStrokes(target) {
         const directionRow = document.createElement("div");
         directionRow.style.display = "flex";
         directionRow.style.flexDirection = "row";
-        directionRow.style.gap = "10px"; 
+        directionRow.style.gap = "10px";
         directionRow.style.flexWrap = "wrap";
 
         for (const dir of part.strokeDirections) {
@@ -1809,6 +1791,55 @@ function showPopup(text, buttonText, buttonFunction, payload = null) {
 
     }
 
+    if (buttonFunction === "displayRandomKanji") {
+
+        const radioBoxContainer = document.createElement("div");
+
+        const correctRow = document.createElement("div");
+        correctRow.classList.add("radioCheckBox");
+
+        const correctRadio = document.createElement("input");
+        correctRadio.type = "radio";
+        correctRadio.name = "result";
+        correctRadio.value = "correct";
+
+        const correctLabel = document.createElement("label");
+        correctLabel.textContent = "Override - Correct";
+
+        correctRow.appendChild(correctRadio);
+        correctRow.appendChild(correctLabel);
+        radioBoxContainer.appendChild(correctRow);
+
+        const incorrectRow = document.createElement("div");
+        incorrectRow.classList.add("radioCheckBox");
+
+        const incorrectRadio = document.createElement("input");
+        incorrectRadio.type = "radio";
+        incorrectRadio.name = "result";
+        incorrectRadio.value = "incorrect";
+
+        const incorrectLabel = document.createElement("label");
+        incorrectLabel.textContent = "Override - Incorrect";
+
+        incorrectRow.appendChild(incorrectRadio);
+        incorrectRow.appendChild(incorrectLabel);
+        radioBoxContainer.appendChild(incorrectRow);
+
+        popup.appendChild(radioBoxContainer);
+
+        const selected = document.querySelector('input[name="result"]:checked');
+
+        if (selected?.value === "correct") {
+            override = "correct";
+        }
+        else if (selected?.value === "incorrect") {
+            override = "incorrect";
+        }
+        else {
+            override = null;
+        }
+    }
+
     popup.appendChild(popupButton);
 
     popupButton.addEventListener("click", () => {
@@ -1816,6 +1847,22 @@ function showPopup(text, buttonText, buttonFunction, payload = null) {
         closePopup();
 
         if (buttonFunction === "displayRandomKanji") {
+
+            let updatedCorrectness = currentDisplayedKanji.correctness ?? 0;
+            const selected = document.querySelector('input[name="result"]:checked');
+
+            if (selected?.value === "correct") {
+                updatedCorrectness = Math.round((updatedCorrectness + 100) / 2);
+            }
+
+            else if (selected?.value === "incorrect") {
+                updatedCorrectness = Math.round(updatedCorrectness / 2);
+            }
+
+            updatedCorrectness = Math.max(0, updatedCorrectness);
+            saveKanjiEdits(currentDisplayedKanji.kanji, { correctness: updatedCorrectness });
+
+            console.log("Updated Correctness: " + updatedCorrectness);
             displayRandomKanji();
         }
 

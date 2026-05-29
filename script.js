@@ -344,6 +344,7 @@ function resetStrokeData() {
 
     hintPressed = false;
     currentDisplayedKanji.userStrokes = [];
+    displayDirections.classList.remove("answer");
 
     currentDisplayedKanji.parts.forEach((part, index) => {
         currentDisplayedKanji.userStrokes[index] = [];
@@ -541,6 +542,7 @@ function checkKanji() {
 function displayCorrectKanjiStrokes(target) {
 
     displayDirections.innerHTML = "";
+    displayDirections.classList.add("answer");
     randomKanjiDisplay.textContent = currentDisplayedKanji.kanji;
 
     for (const part of target.parts) {
@@ -1710,6 +1712,7 @@ function showPage(pageToShow) {
         toggleStrokeHelpImageState = false;
         displayDirections.innerHTML = "";
         displayDirections.classList.remove("hidden");
+        displayDirections.classList.remove("answer");
         displayRandomKanji();
         resetStrokeData();
         document.documentElement.style.setProperty('--pageColor', '#D6E5BD');

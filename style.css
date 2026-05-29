@@ -258,9 +258,9 @@ button {
 
 #displayDirections {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 10px;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     background-color: #d6e5bd8a;
     padding: 20px;
     border-radius: 15px;
@@ -271,6 +271,12 @@ button {
     font-family: "Noto Serif JP", "Times, New Roman", "Arial", sans-serif;
     max-height: 50px;
     overflow-y: scroll;
+}
+
+#displayDirections.answer {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
 }
 
 #displayDirections div {

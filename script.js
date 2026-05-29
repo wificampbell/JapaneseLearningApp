@@ -1836,7 +1836,7 @@ function showPopup(text, buttonText, buttonFunction, payload = null) {
             override = "incorrect";
         }
         else {
-            override = null;
+            override = "";
         }
     }
 
@@ -1848,21 +1848,22 @@ function showPopup(text, buttonText, buttonFunction, payload = null) {
 
         if (buttonFunction === "displayRandomKanji") {
 
-            let updatedCorrectness = currentDisplayedKanji.correctness ?? 0;
-            const selected = document.querySelector('input[name="result"]:checked');
+            if (override != "") {
+                let updatedCorrectness = currentDisplayedKanji.correctness ?? 0;
+                const selected = document.querySelector('input[name="result"]:checked');
 
-            if (selected?.value === "correct") {
-                updatedCorrectness = Math.round((updatedCorrectness + 100) / 2);
+                if (selected?.value === "correct") {
+                    updatedCorrectness = Math.round((updatedCorrectness + 100) / 2);
+                }
+
+                else if (selected?.value === "incorrect") {
+                    updatedCorrectness = Math.round(updatedCorrectness / 2);
+                }
+
+                saveKanjiEdits(currentDisplayedKanji.kanji, { correctness: updatedCorrectness });
+
+                console.log("Updated Correctness: " + updatedCorrectness);
             }
-
-            else if (selected?.value === "incorrect") {
-                updatedCorrectness = Math.round(updatedCorrectness / 2);
-            }
-
-            updatedCorrectness = Math.max(0, updatedCorrectness);
-            saveKanjiEdits(currentDisplayedKanji.kanji, { correctness: updatedCorrectness });
-
-            console.log("Updated Correctness: " + updatedCorrectness);
             displayRandomKanji();
         }
 
